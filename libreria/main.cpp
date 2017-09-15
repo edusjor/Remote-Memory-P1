@@ -42,9 +42,9 @@ int main() {
     rmlib1 = new rmlib();
 
     rmlib1->rm_init(ip,1500,ip,8888);
-    rmlib1->enviarDato("221erwgt,hggsdfxvwdfcadf,easfasdfas,dfdafadfadfgd3");
+    rmlib1->enviarDato("Dato dato");
 
-    rmlib1->enviarDato("221erwgt,hggsddfdafadfadfgd3");
+    
 
 
 
