@@ -68,8 +68,6 @@ Server::Server() {
     //se mantiene escuchando aqui hasta que se conecte algun cliente
 }
 
-// void *Server::playSocket(void *args);
-
 
 Client *c;
 void Server::aceptarEimprimir() {
@@ -79,82 +77,64 @@ void Server::aceptarEimprimir() {
 
         c = new Client();
 
-
-
-
         int clientCount = 1;
 
+        cout<<"inicio : "<<c->sock<<endl<<endl<<endl;
         c->sock = accept(client, (struct sockaddr *) &server_addr, &size);
-        cout << client << endl;
-        cout<<c->sock<<endl<<endl<<endl;
+        //cout << "cliente: "<<client << endl;
+         cout<<"final : "<<c->sock<<endl<<endl<<endl;
+        cout<<"cliente : "<<c->sock<<endl<<endl<<endl;
 
         // first check if it is valid or not
         if (c->sock < 0) {
             cout << "=> Error on accepting..." << endl;
         } else {
 
-            //strcpy(buffer, "=> Server connected...\n");
+          
+            pthread_t thread_id;
+            pthread_create( &thread_id , NULL ,  playSocket , (void*) &c->sock );         
 
-           // pthread_t t1;
-
-            //pthread_create(&t1, NULL, &playSocket, NULL);
-            //void* result;
-            //pthread_join(t1,&result);
-
-            //std::thread t(playSocket);
-            //t.join();
-            //playSocket()
         }
     }
 }
 
 
+void* Server::playSocket(void* socket_desc){
+//Get the socket descriptor
+    int sock = *(int*)socket_desc;
+    int read_size;
+    char *message , client_message[2000];
 
+    //Send some messages to the client
+    message = "Greetings! I am your connection handler\n";
+    write(sock , message , strlen(message));
 
-void* Server::playSocket(void* var){
+    message = "Now type something and i shall repeat what you type \n";
+    write(sock , message , strlen(message));
 
-    //Client *c =ss(Client *) args;
-    char buffer[1024], message[1024];
-    int n;
+    //Receive a message from client
+    while( (read_size = recv(sock , client_message , 2000 , 0)) > 0 )
+    {
+        //end of string marker
+        client_message[read_size] = '\0';
+        cout << "Mensaje del cliente: "<<client_message<<endl;
+        //Send the message back to client
+        write(sock , client_message , strlen(client_message));
+        cout << "Mensaje del servidor: "<<client_message<<endl;
 
-    //mutex
-
-    //Before adding the new client, calculate its id. (Now we have the lock)
-    //c->SetId(Server::clients.size());
-    //sprintf(buffer, "Client n.%d", c->id);
-//    c->SetName(buffer);
-//    cout << "Adding client with id: " << c->id << endl;
-//    Server::clients.push_back(*c);
-
-    //cout << "Yeeah baby1";
-
-    //mutex fin
-    send(c->sock, "Servidor listo para recibir datos", 1024, 0);
-    while(1){
-        send(c->sock, "confirmado ", 1024, 0);
-        memset(buffer, 0, sizeof buffer);
-        n = recv(c->sock, buffer, sizeof buffer, 0);
-
-        if(n == 0) {
-            cout << "Client " << " diconnected" << endl;
-            close(c->sock);
-            break;
-        }
-        else{
-            if (n<0){
-                cerr << "error mientras se recive el mensaje del cliente "<<endl;
-            }
-            else{
-                //Mensaje received.
-                snprintf(message, sizeof message, buffer);
-                cout << "Will send to all: " << message << endl;
-
-            }
-        }
+        //clear the message buffer
+        memset(client_message, 0, 2000);
     }
 
-    //End thread
-    //return NULL;
+    if(read_size == 0)
+    {
+        puts("Client disconnected");
+        fflush(stdout);
+    }
+    else if(read_size == -1)
 
-}
+    {
+        perror("recv failed");
+    }
+    }
 ////////////////////////////////////////////////

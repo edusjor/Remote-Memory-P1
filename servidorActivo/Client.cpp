@@ -8,7 +8,6 @@ using namespace std;
 
 Client::Client() {
     this->name = (char *) malloc(MAX_NAME_LENGHT+1);
-
 }
 
 void Client::SetName(const char *name) {

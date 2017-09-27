@@ -38,8 +38,8 @@ private:
 
     int client;
 
-    int bufsize = 1024;
-    char buffer[1024];
+    int bufsize = 2000;
+    char buffer[2000];
 
 
     int socketActuar(char*  dato);
