@@ -26,22 +26,15 @@ class Array{
             this->arr[2]=size;
         }
 
-        string *returnArray(){
-/*
-            string array[3];
-            for (int i=0; i<3; i++){
-                array[i] = arr[i];
-            }
-*/
+        string *returnArray(){ //retorna un puntero del array
             string *parray=arr;
-
             return parray;
         }
 
         void printArray(){
             string array[3]=*returnArray();
             for (int i=0; i<3; i++){
-                //cout<<array[i]<<", ";
+                cout<<array[i]<<", ";
             }
         }
         

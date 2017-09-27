@@ -28,11 +28,15 @@ class Node
 {
     public:
         Node();
-        Node(T);
+        Node(T,T,T);
         ~Node();
 
         Node *next;
-        T data;
+        //T data;
+
+        T llave;
+        T valor;
+        T size;
 
         void delete_all();
         void print();

@@ -22,15 +22,21 @@ template<typename T>
 
 Node<T>::Node()
 {
-    data = NULL;
+    llave = NULL;
+    valor = NULL;
+    size = NULL;
     next = NULL;
 }
 
 // Constructor por parámetro
 template<typename T>
-Node<T>::Node(T data_)
+Node<T>::Node(T llave, T valor, T size)
 {
-    data = data_;
+	this->llave= llave;
+	this->valor= valor;
+	this->size=size;
+
+    //data = data_;
     next = NULL;
 }
 
@@ -48,7 +54,7 @@ template<typename T>
 void Node<T>::print()
 {
     //cout << "Node-> " << "Dato: " << dato << " Direcion: " << this << " Siguiente: " << next << endl;
-    cout << data << "-> ";
+    cout << llave << "-> ";
 }
 
 template<typename T>

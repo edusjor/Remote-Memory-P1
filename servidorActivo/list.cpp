@@ -29,9 +29,9 @@ List<T>::List()
 
 // Insertar al inicio
 template<typename T>
-void List<T>::add_head(T data_)
+void List<T>::add_head(T llave,T valor, T size)
 {
-    Node<T> *new_node = new Node<T> (data_);
+    Node<T> *new_node = new Node<T> (llave,valor,size);
     Node<T> *temp = m_head;
 
     if (!m_head) {
@@ -321,6 +321,7 @@ void List<T>::print()
 
 
 
+/*
 // Buscar el dato de un nodo
 template<typename T>
 void List<T>::search(T data_)
@@ -330,7 +331,7 @@ void List<T>::search(T data_)
     int cont2 = 0;
 
     while (temp) {
-        if (temp->data == data_) {
+        if (temp->llave == data_) {
             cout << "El dato se encuentra en la posición: " << cont << endl;
             cont2++;
         }
@@ -342,7 +343,35 @@ void List<T>::search(T data_)
         cout << "No existe el dato " << endl;
     }
     cout << endl << endl;
+}*/
+
+// Buscar el dato de un nodo por llave y muestra el valor y size
+template<typename T>
+void List<T>::search(T data_)
+{
+    Node<T> *temp = m_head;
+    int cont = 1;
+    int cont2 = 0;
+
+    while (temp) {
+        if (temp->llave == data_) {
+            cout << "El dato se encuentra en la posición: " << cont << endl;
+            cout << "El dato guardado es: " << temp->valor << endl;
+            cout << "El size del dato es : " << temp->size << endl;
+            
+            
+            cont2++;
+        }
+        temp = temp->next;
+        cont++;
+    }
+
+    if (cont2 == 0) {
+        cout << "No existe el dato " << endl;
+    }
+    cout << endl << endl;
 }
+
 
 // Ordenar de manera ascendente
 template<typename T>

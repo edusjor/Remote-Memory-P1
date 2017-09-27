@@ -10,9 +10,7 @@
 
 #include "list.h"
 #include "list.cpp"
-
 #include "Client.h"
-
 
 #include <string.h>
 #include <sys/types.h>
@@ -25,23 +23,21 @@
 #include <cstdlib>
 #include "Array.h"
 
+List<string> list_1; //lista global
 
-
-
-List<int> list_1;
 Server::Server() {
 
-    Array ar;
-    ar.crearArray("llavee","valoor","21");
-    ar.printArray();
+    //Array ar;
+    //ar.crearArray("llavee","valoor","21");
+    //ar.printArray();
 
 
     string numero = "1234";
     int num =atoi(numero.c_str()); // convierte string a entero
     cout<<"numero: "<<num+2<<endl;
 
-    list_1.add_head(321123);
-    list_1.print();
+    //list_1.add_head(321123);
+    //list_1.print();
 
     int yes = 1;
 
@@ -139,9 +135,16 @@ void* Server::playSocket(void* socket_desc){
         cout << "Mensaje del cliente: "<<client_message<<endl;
         //Send the message back to client
 
-        list_1.add_head(888);
+        //Array ar;
+        //ar.crearArray("llavee",client_message,to_string(sizeof(client_message)));
+        //cout<<endl<<endl;
+        //ar.printArray();
 
+        list_1.add_head("hello"," World","34");
         list_1.print();
+        list_1.search("hello");
+
+        //list_1.print();
         write(sock , client_message , strlen(client_message));
         cout << "Mensaje del servidor: "<<client_message<<endl;
 
