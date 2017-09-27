@@ -26,6 +26,8 @@
 
 using namespace std;
 
+
+
 class Server {
 
 private:
@@ -36,6 +38,8 @@ private:
     bool isExit = false;
     int bufsize = 1024;
     char buffer[1024];
+
+
 
 
 
@@ -51,8 +55,7 @@ public:
     Server();
     void aceptarEimprimir();
     static void* playSocket(void* var);
-
-private:
+    
 
 };
 

@@ -4,6 +4,10 @@
 
 #include "Server.h"
 
+#include "list.h"
+#include "list.cpp"
+
+
 using namespace std;
 
 int main() {
@@ -14,6 +18,7 @@ int main() {
 
     //Main loop
     s->aceptarEimprimir();
+
 
     return 0;
 }

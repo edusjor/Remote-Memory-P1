@@ -7,8 +7,10 @@
 
 #include <iostream>
 
+
 #include "list.h"
 #include "list.cpp"
+
 #include "Client.h"
 
 
@@ -20,10 +22,26 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <thread>
+#include <cstdlib>
+#include "Array.h"
 
 
 
+
+List<int> list_1;
 Server::Server() {
+
+    Array ar;
+    ar.crearArray("llavee","valoor","21");
+    ar.printArray();
+
+
+    string numero = "1234";
+    int num =atoi(numero.c_str()); // convierte string a entero
+    cout<<"numero: "<<num+2<<endl;
+
+    list_1.add_head(321123);
+    list_1.print();
 
     int yes = 1;
 
@@ -77,7 +95,7 @@ void Server::aceptarEimprimir() {
 
         c = new Client();
 
-        int clientCount = 1;
+       // int clientCount = 1;
 
         cout<<"inicio : "<<c->sock<<endl<<endl<<endl;
         c->sock = accept(client, (struct sockaddr *) &server_addr, &size);
@@ -98,12 +116,13 @@ void Server::aceptarEimprimir() {
     }
 }
 
-
+//entra aqui por cada nueva conexion
 void* Server::playSocket(void* socket_desc){
 //Get the socket descriptor
     int sock = *(int*)socket_desc;
     int read_size;
     char *message , client_message[2000];
+
 
     //Send some messages to the client
     message = "Greetings! I am your connection handler\n";
@@ -119,6 +138,10 @@ void* Server::playSocket(void* socket_desc){
         client_message[read_size] = '\0';
         cout << "Mensaje del cliente: "<<client_message<<endl;
         //Send the message back to client
+
+        list_1.add_head(888);
+
+        list_1.print();
         write(sock , client_message , strlen(client_message));
         cout << "Mensaje del servidor: "<<client_message<<endl;
 
