@@ -9,6 +9,10 @@
 #include <iostream>
 #include <unistd.h>
 
+//estructura de control
+#include "list.h"
+#include "list.cpp"
+
 using  namespace std;
 ////////////////////////////////////////
 //estrucura de control
@@ -130,8 +134,9 @@ int rmlib::socketActuar(char* dato){
         cout << "Client: ";
         //cin >> buffer;
 
-        send(client, dato, bufsize, 0);
+        //send(client, dato, bufsize, 0);
 
+        write(client , dato , strlen(dato));
         n=recv(client, buffer, bufsize, 0);
         if (n<=0){
             cerr <<"servidor desconectado"<<endl;

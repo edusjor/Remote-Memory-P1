@@ -15,58 +15,47 @@
  * Inc., 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include <iostream>
+#include "node.h"
 
+// Constructor por defecto
+template<typename T>
 
-
-#include <string.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <thread>
-#include "rmlib.h"
-
-using namespace std;
-
-
-
-
-int main() {
-
-    char* ip = "127.0.0.1";
-
-    rmlib* rmlib1;
-    rmlib1 = new rmlib();
-
-    rmlib1->rm_init(ip,1500,ip,8888);
-
-
-
-    string llave= "1";
-    string valor="2";
-    string size="16";
-
-    string parametros = llave+","+valor+","+size;
-     char *chrParametros = &parametros[0u]; //convierte string a char
-
-    rmlib1->enviarDato(chrParametros);
-
-    
-
-
-
+Node<T>::Node()
+{
+    llave = NULL;
+    valor = NULL;
+    size = NULL;
+    next = NULL;
 }
 
+// Constructor por parámetro
+template<typename T>
+Node<T>::Node(T llave, T valor, T size)
+{
+	this->llave= llave;
+	this->valor= valor;
+	this->size=size;
 
+    //data = data_;
+    next = NULL;
+}
 
+// Eliminar todos los Nodos
+template<typename T>
+void Node<T>::delete_all()
+{
+    if (next)
+        next->delete_all();
+    delete this;
+}
 
+// Imprimir un Nodo
+template<typename T>
+void Node<T>::print()
+{
+    //cout << "Node-> " << "Dato: " << dato << " Direcion: " << this << " Siguiente: " << next << endl;
+    cout << llave << "-> ";
+}
 
-
-
-
-
-
-
+template<typename T>
+Node<T>::~Node() {}

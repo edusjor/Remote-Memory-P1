@@ -15,58 +15,48 @@
  * Inc., 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+#ifndef LIST_H
+#define LIST_H
+
+#include <fstream>
 #include <iostream>
-
-
-
-#include <string.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
+#include <string>
 #include <stdlib.h>
-#include <unistd.h>
-#include <thread>
-#include "rmlib.h"
+
+#include "node.h"
+#include "node.cpp"
 
 using namespace std;
 
+template <class T>
+
+class List
+{
+    public:
+        List();
+        ~List();
+
+        void add_head(T,T,T);
+        void add_end(T);
+        void add_sort(T);
+        void concat(List);
+        void del_all();
+        void del_by_data(T);
+        void del_by_position(int);
+        void fill_by_user(int);
+        void fill_random(int);
+        void intersection(List);
+        void invert();
+        void load_file(string);
+        void print();
+        void save_file(string);
+        void search(T);
+        void sort();
 
 
+    private:
+        Node<T> *m_head;
+        int m_num_nodes;
+};
 
-int main() {
-
-    char* ip = "127.0.0.1";
-
-    rmlib* rmlib1;
-    rmlib1 = new rmlib();
-
-    rmlib1->rm_init(ip,1500,ip,8888);
-
-
-
-    string llave= "1";
-    string valor="2";
-    string size="16";
-
-    string parametros = llave+","+valor+","+size;
-     char *chrParametros = &parametros[0u]; //convierte string a char
-
-    rmlib1->enviarDato(chrParametros);
-
-    
-
-
-
-}
-
-
-
-
-
-
-
-
-
-
-
+#endif // LIST_H

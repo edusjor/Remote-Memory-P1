@@ -15,58 +15,31 @@
  * Inc., 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+#ifndef NODE_H
+#define NODE_H
+
 #include <iostream>
-
-
-
-#include <string.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <thread>
-#include "rmlib.h"
 
 using namespace std;
 
+template <class T>
 
+class Node
+{
+    public:
+        Node();
+        Node(T,T,T);
+        ~Node();
 
+        Node *next;
+        //T data;
 
-int main() {
+        T llave;
+        T valor;
+        T size;
 
-    char* ip = "127.0.0.1";
+        void delete_all();
+        void print();
+};
 
-    rmlib* rmlib1;
-    rmlib1 = new rmlib();
-
-    rmlib1->rm_init(ip,1500,ip,8888);
-
-
-
-    string llave= "1";
-    string valor="2";
-    string size="16";
-
-    string parametros = llave+","+valor+","+size;
-     char *chrParametros = &parametros[0u]; //convierte string a char
-
-    rmlib1->enviarDato(chrParametros);
-
-    
-
-
-
-}
-
-
-
-
-
-
-
-
-
-
-
+#endif // NODE_H
