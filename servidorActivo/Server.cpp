@@ -21,16 +21,11 @@
 #include <unistd.h>
 #include <thread>
 #include <cstdlib>
-#include "Array.h"
+
 
 List<string> list_1; //lista global
 
 Server::Server() {
-
-    //Array ar;
-    //ar.crearArray("llavee","valoor","21");
-    //ar.printArray();
-
 
     string numero = "1234";
     int num =atoi(numero.c_str()); // convierte string a entero
@@ -117,7 +112,7 @@ void* Server::playSocket(void* socket_desc){
 //Get the socket descriptor
     int sock = *(int*)socket_desc;
     int read_size;
-    char *message , client_message[2000];
+    char *message , client_message[1024];
 
 
     //Send some messages to the client
@@ -128,28 +123,28 @@ void* Server::playSocket(void* socket_desc){
     write(sock , message , strlen(message));
 
     //Receive a message from client
-    while( (read_size = recv(sock , client_message , 2000 , 0)) > 0 )
+    while( (read_size = recv(sock , client_message , 1024 , 0)) > 0 )
     {
         //end of string marker
         client_message[read_size] = '\0';
         cout << "Mensaje del cliente: "<<client_message<<endl;
-        //Send the message back to client
+        
+        //verifica las llaves que hay, y la que no esta pero le sigue a la ultima sera la nueva llave
 
-        //Array ar;
-        //ar.crearArray("llavee",client_message,to_string(sizeof(client_message)));
-        //cout<<endl<<endl;
-        //ar.printArray();
+        string sizeMensaje = to_string(sizeof(client_message));
+        cout<<"tamano del mensaje: "<<sizeMensaje<<endl;
+        string strclient_message=string(client_message);
 
-        list_1.add_head("hello"," World","34");
+        list_1.add_head("nuevaLlave",strclient_message,sizeMensaje);
         list_1.print();
-        list_1.search("hello");
+        list_1.search("nuevaLlave");
 
         //list_1.print();
         write(sock , client_message , strlen(client_message));
         cout << "Mensaje del servidor: "<<client_message<<endl;
 
         //clear the message buffer
-        memset(client_message, 0, 2000);
+        memset(client_message, 0, 1024);
     }
 
     if(read_size == 0)

@@ -49,7 +49,7 @@ private:
 
 
     //struct sockaddr_in serverAddr, clientAddr;
-    char buff[256];
+    char buff[1024];
 
 public:
     Server();
