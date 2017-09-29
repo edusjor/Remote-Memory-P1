@@ -115,22 +115,53 @@ void* Server::playSocket(void* socket_desc){
     {
         //end of string marker
         client_message[read_size] = '\0';
-        cout << "Mensaje del cliente: "<<client_message<<endl;
+        cout <<endl<<endl<< "Mensaje del cliente: "<<client_message<<endl;
         
-        //verifica las llaves que hay, y la que no esta pero le sigue a la ultima sera la nueva llave
+        
 
-        //hagarrar el mensaje y dividirlo por las comas que hay
-        string sizeMensaje = to_string(sizeof(client_message));
-        cout<<"tamano del mensaje: "<<sizeMensaje<<endl;
+        //itera el string del char recibido en el mensaje 
+        //para separar la llave, el valor y el tamano
         string strclient_message=string(client_message);
+        string valor;
+        string size;
+        int cont=0;
+        string separador="#";
 
-        list_1.add_head("nuevaLlave",strclient_message,sizeMensaje);
-        list_1.print();
-        list_1.search("nuevaLlave");
+        for(int i=0; i<strclient_message.length(); i++){
+            
+            if ((strclient_message[i])==separador[0]){
+                cont+=1;
+            }
+            else{
+                if(cont==0)
+                    valor=valor+strclient_message[i];
 
-        //list_1.print();
-        write(sock , client_message , strlen(client_message));
-        cout << "Mensaje del servidor: "<<client_message<<endl;
+                if(cont==1)
+                    size=size+strclient_message[i];
+            }
+        }
+
+
+
+      
+
+        int nummRandom=rand();
+        string llave=to_string(nummRandom); //llave aleatoria creada en el server
+
+        list_1.add_head(llave,valor,size);   //guarda la llave, el valor y tamano del dato
+        list_1.print(); 
+        list_1.search(llave);
+
+
+        
+        char *chrLlave = &llave[0u]; //convierte la llave de string a char
+
+        write(sock , chrLlave , strlen(chrLlave)); //envia la llave creada al cliente
+
+        cout<<"//////////////////////////////////////////////"<<endl;
+        cout << "Llave creada: "<<llave<<endl;
+        cout <<"Valor: "<<valor<<endl;
+        cout << "Size of valor: "<< sizeof(size) <<endl;
 
         //clear the message buffer
         memset(client_message, 0, 1024);
