@@ -36,7 +36,7 @@ class List
         List();
         ~List();
 
-        void add_head(T,T,T);
+        void add_head(T,T,T); //Agrega a la lista
         void add_end(T);
         void add_sort(T);
         void concat(List);
@@ -50,7 +50,8 @@ class List
         void load_file(string);
         void print();
         void save_file(string);
-        void search(T);
+        void searchIndex(T);  //busca un dato para imprimirlo
+        string searchData(T); //busca un dato por llave para retornarlo junto con su tamano
         void sort();
 
 

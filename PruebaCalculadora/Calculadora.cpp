@@ -20,6 +20,8 @@
 
 using namespace std;
 
+
+
 rmlib* rmlib1;
 
 
@@ -43,7 +45,13 @@ int Calculadora::guiOperacion(string operacion){
         string parametros = oper+"#"+llave+"#"+valor+"#"+size;
         char *chrParametros = &parametros[0u]; //convierte string a char
 
-        rmlib1->enviarDato(chrParametros);
+        string llaveDelServer=rmlib1->enviarDato(chrParametros);
+        if (llaveDelServer=="0"){
+            cout<<"error, servidores desconectados"<<endl;
+        }
+
+        cout<<llaveDelServer<<endl;
+
         //hacer una igualdar con lo anterior para recibir la respuesta
 
         interfaz();

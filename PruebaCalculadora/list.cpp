@@ -345,9 +345,11 @@ void List<T>::search(T data_)
     cout << endl << endl;
 }*/
 
+
+
 // Buscar el dato de un nodo por llave y muestra el valor y size
 template<typename T>
-void List<T>::search(T data_)
+void List<T>::searchIndex(T data_)
 {
     Node<T> *temp = m_head;
     int cont = 1;
@@ -370,6 +372,32 @@ void List<T>::search(T data_)
         cout << "No existe el dato " << endl;
     }
     cout << endl << endl;
+}
+
+// Buscar el dato de un nodo por llave y retorna el valor 
+template<typename T>
+string List<T>::searchData(T data_)
+{
+    Node<T> *temp = m_head;
+    int cont = 1;
+    int cont2 = 0;
+
+    while (temp) {
+        if (temp->llave == data_) {
+
+            return temp->valor;  // retorna solo el valor que va a ser la llave que busca el dato en el server
+            
+            cont2++;
+        }
+        temp = temp->next;
+        cont++;
+    }
+
+    if (cont2 == 0) {
+        cout << "No existe el dato con la llave: "<<data_ << endl;
+        return "0";
+    }
+    return "0";
 }
 
 
