@@ -13,6 +13,8 @@
 #include "list.h"
 #include "list.cpp"
 
+//list<string> listaContr; // estructura de control, lista global
+
 using  namespace std;
 ////////////////////////////////////////
 //estrucura de control
@@ -29,6 +31,7 @@ public:
     int socketClient();
     void rm_init(char* ip, int port, char* ipHA, int portHA);
     int enviarDato(char* dato);
+    string getDato(char* llave);
 private:
     char* ipActivo;
     char* ipPasivo;
@@ -105,65 +108,103 @@ int rmlib::socketClient() {
     /* ---------- CONNECTING THE SOCKET ---------- */
     /* ---------------- connect() ---------------- */
 
-    if (connect(client, (struct sockaddr *) &server_addr, sizeof(server_addr)) == 0)
+    if (connect(client, (struct sockaddr *) &server_addr, sizeof(server_addr)) == 0){
         cout << "=> Connection to the server port number: " << portNum << endl;
+    }else{
+        cout <<"servidor no conectado"<<endl;
+    }
 
 
     cout << "=> Awaiting confirmation from the server..." << endl; //line 40
     recv(client, buffer, bufsize, 0);
+    
     cout << "=> Connection confirmed, you are good to go..." << endl;
 
 }
 
 int rmlib::enviarDato(char* dato){
-    if (socketActuar(dato)==false){
-        portAvailable=portPasivo;
-        cout<<"Conectandose al servidor Pasivo"<<endl;
-        socketClient();
-        cout<<"Conectandodo al Pasivo"<<endl;
-        if (socketActuar(dato)==false)
-            cout<<"Ningun servidor esta activo"<<endl;
+    
 
-    } else
-        socketActuar(dato);
+    cout<<"Comunicando con el servidor Activo"<<endl;
+    if (socketActuar(dato)==1){
+        cout<<"Exito!, libreria y servidor Activo han intercambiado datos exitosamente"<<endl<<endl<<endl;
+        return 1;
+    }
+
+    else{
+        cout<<"Servidor Activo desconectado"<<endl;
+            
+        cout<<"Intentando conectar al servidor Pasivo..."<<endl;
+        portAvailable=portPasivo; //cambia el puerto disponible (pasivo a activo)            
+        socketClient();
+            
+        cout<<"Comunicando con el servidor Pasivo"<<endl;
+        if (socketActuar(dato)==1){                
+            cout<<"Exito!, libreria y servidor Pasivo han intercambiado datos exitosamente"<<endl;
+            return 1;}
+
+        else{
+            cout<<"Ningun servidor esta activo"<<endl;
+            return 0;
+            }
+
+                
+    }
+        
+        
 
 }
 int rmlib::socketActuar(char* dato){
 
-    do {
         cout << "Client: ";
         //cin >> buffer;
 
         //send(client, dato, bufsize, 0);
 
         write(client , dato , strlen(dato));
+        cout << "Tamano del dato antes de enviar: "<<strlen(dato)<<endl<<endl;
+        
+        //Respuesta del server
         n=recv(client, buffer, bufsize, 0);
+
         if (n<=0){
             cerr <<"servidor desconectado"<<endl;
             cout << "servidor no conectado"<<endl;
+            return 0;
+        }
+        
+        string llaveEnServer=buffer;
+
+        cout<<"Llave en server: "<<buffer<<endl;
+        cout << "Tamano del dato enviado: "<<bufsize<<endl;
 
 
-            break;}
-
-        cout << buffer<<endl;
-    }while(true);
-
+        //guardar buffer(llave) en la estructura de control
+        
+        cout<<endl<<"__La conexion fue exitosa__"<<endl<<endl;
 
 
+        
+    //close(client);
+    return 1;
+}
 
-    /* ---------------- CLOSE CALL ------------- */
-    /* ----------------- close() --------------- */
+string rmlib::getDato(char* llave){
+    write(client , llave , strlen(llave));
+    //Respuesta del server
+    n=recv(client, buffer, bufsize, 0);
 
-    /*
-        Once the server presses # to end the connection,
-        the loop will break and it will close the server
-        socket connection and the client connection.
-    */
+    if (n<=0){
+        cerr <<"servidor desconectado"<<endl;
+        cout << "servidor no conectado"<<endl;
+        return "NoServerFound";
+    }
 
-    cout << "\n=> Connection terminated.\nGoodbye...\n";
+    string valorEnServer=buffer;
+    if(valorEnServer=="NoDataFound")
+        return "NoDataFound";
 
-    close(client);
-    return 0;
+    return valorEnServer;
 }
 
 

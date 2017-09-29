@@ -113,6 +113,7 @@ void* Server::playSocket(void* socket_desc){
     //Receive a message from client
     while( (read_size = recv(sock , client_message , 1024 , 0)) > 0 )
     {
+
         //end of string marker
         client_message[read_size] = '\0';
         cout <<endl<<endl<< "Mensaje del cliente: "<<client_message<<endl;
@@ -122,8 +123,11 @@ void* Server::playSocket(void* socket_desc){
         //itera el string del char recibido en el mensaje 
         //para separar la llave, el valor y el tamano
         string strclient_message=string(client_message);
+        string operacion;
+        string llave;
         string valor;
         string size;
+
         int cont=0;
         string separador="#";
 
@@ -134,35 +138,56 @@ void* Server::playSocket(void* socket_desc){
             }
             else{
                 if(cont==0)
-                    valor=valor+strclient_message[i];
+                    operacion=operacion+strclient_message[i];
 
                 if(cont==1)
+                    llave=llave+strclient_message[i];
+
+                if(cont==2)
+                    valor=valor+strclient_message[i];
+
+                if(cont==3)
                     size=size+strclient_message[i];
             }
         }
 
+        string operacion1="guardarValor";
+        string operacion2="getValor";
 
+        //guardarValor
+        if(operacion==operacion1){ 
 
-      
+            int nummRandom=rand();
+            string llave=to_string(nummRandom); //llave aleatoria creada en el server
 
-        int nummRandom=rand();
-        string llave=to_string(nummRandom); //llave aleatoria creada en el server
+            list_1.add_head(llave,valor,size);   //guarda la llave, el valor y tamano del dato
+            list_1.print(); 
+            list_1.searchIndex(llave);
+            
+            char *chrLlave = &llave[0u]; //convierte la llave de string a char
 
-        list_1.add_head(llave,valor,size);   //guarda la llave, el valor y tamano del dato
-        list_1.print(); 
-        list_1.search(llave);
+            write(sock , chrLlave , strlen(chrLlave)); //envia la llave creada al cliente
 
+            cout<<"//////////////////////////////////////////////"<<endl;
+            cout << "Llave creada: "<<llave<<endl;
+            cout <<"Valor: "<<valor<<endl;
+            cout << "Size of valor: "<< sizeof(size) <<endl; 
+        }
+        //getValor
+        if (operacion==operacion2){ 
+            string datoRetornado=list_1.searchData(llave);
+            if (datoRetornado!="0"){
+                char *chrDato = &datoRetornado[0u]; //convierte el dato de string a char
+                write(sock , chrDato , strlen(chrDato)); //envia el dato pedido por llave al cliente
+                //clear the message buffer
+            }
+            else{
+                string msj="NoDataFound";
+                char *chrMsj = &msj[0u]; //convierte el dato de string a char
+                write(sock , chrMsj , strlen(chrMsj)); //envia el dato pedido por llave al cliente
 
-        
-        char *chrLlave = &llave[0u]; //convierte la llave de string a char
-
-        write(sock , chrLlave , strlen(chrLlave)); //envia la llave creada al cliente
-
-        cout<<"//////////////////////////////////////////////"<<endl;
-        cout << "Llave creada: "<<llave<<endl;
-        cout <<"Valor: "<<valor<<endl;
-        cout << "Size of valor: "<< sizeof(size) <<endl;
-
+            }
+        }
         //clear the message buffer
         memset(client_message, 0, 1024);
     }
@@ -173,9 +198,8 @@ void* Server::playSocket(void* socket_desc){
         fflush(stdout);
     }
     else if(read_size == -1)
-
     {
         perror("recv failed");
     }
-    }
+}
 ////////////////////////////////////////////////

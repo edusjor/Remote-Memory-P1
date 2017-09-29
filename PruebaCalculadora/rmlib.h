@@ -31,6 +31,7 @@ public:
     int socketClient();
     void rm_init(char* ip, int port, char* ipHA, int portHA);
     int enviarDato(char* dato);
+    string getDato(char* llave);
 private:
     char* ipActivo;
     char* ipPasivo;
@@ -169,7 +170,6 @@ int rmlib::socketActuar(char* dato){
         if (n<=0){
             cerr <<"servidor desconectado"<<endl;
             cout << "servidor no conectado"<<endl;
-
             return 0;
         }
         
@@ -187,6 +187,24 @@ int rmlib::socketActuar(char* dato){
         
     //close(client);
     return 1;
+}
+
+string rmlib::getDato(char* llave){
+    write(client , llave , strlen(llave));
+    //Respuesta del server
+    n=recv(client, buffer, bufsize, 0);
+
+    if (n<=0){
+        cerr <<"servidor desconectado"<<endl;
+        cout << "servidor no conectado"<<endl;
+        return "NoServerFound";
+    }
+
+    string valorEnServer=buffer;
+    if(valorEnServer=="NoDataFound")
+        return "NoDataFound";
+
+    return valorEnServer;
 }
 
 

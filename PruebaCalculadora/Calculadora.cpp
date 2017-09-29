@@ -34,16 +34,18 @@ int Calculadora::guiOperacion(string operacion){
         int sum=num1+num2;
         cout <<"La suma es: "<< num1+num2 <<endl<<endl;
 
-        //string llave= "Suma total";
+        string oper="guardarValor";
+        string llave= "null";
         string valor=to_string(num1+num2);
         string size=to_string(sizeof(valor));
 
 
-        string parametros = valor+"#"+size;
+        string parametros = oper+"#"+llave+"#"+valor+"#"+size;
         char *chrParametros = &parametros[0u]; //convierte string a char
 
         rmlib1->enviarDato(chrParametros);
         //hacer una igualdar con lo anterior para recibir la respuesta
+
         interfaz();
 
 
