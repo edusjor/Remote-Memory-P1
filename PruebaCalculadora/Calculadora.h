@@ -33,7 +33,7 @@ private:
     int multiplicacion();
     int division();
 
-    
+    void mostrarPrevSumas();
 
     int guiOperacion(string);
     int interfaz();

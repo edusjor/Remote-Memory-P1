@@ -21,6 +21,8 @@
 using namespace std;
 
 rmlib* rmlib1;
+
+
 int Calculadora::guiOperacion(string operacion){
     int num1;
     int num2;
@@ -41,6 +43,7 @@ int Calculadora::guiOperacion(string operacion){
         char *chrParametros = &parametros[0u]; //convierte string a char
 
         rmlib1->enviarDato(chrParametros);
+        interfaz();
 
 
     if (operacion == "-")
@@ -69,12 +72,19 @@ int Calculadora::division() {
     guiOperacion("/");
     return 0;
 }
+void Calculadora::mostrarPrevSumas(){
+    cout<<"Estas son todas las operaciones de suma anteriores: "<<endl;
+    //traer todas las anteriores sumas
+    interfaz();
+
+}
 int Calculadora::interfaz(){
     cout << "1-Suma"<<endl;
     cout << "2-Restar"<<endl;
     cout << "3-Multiplicar"<<endl;
     cout << "4-Dividir"<<endl;
-    cout << "5-Salir"<<endl<<endl;
+    cout << "5-Mostrar Previas Sumas"<<endl;
+    cout << "6-Salir"<<endl<<endl;
 
 
     int choice;
@@ -95,6 +105,9 @@ int Calculadora::interfaz(){
             division();
             break;
         case 5:
+            mostrarPrevSumas();
+            break;
+        case 6:
             exit(true);
 
     }

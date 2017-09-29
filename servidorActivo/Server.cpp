@@ -11,6 +11,7 @@
 #include "list.h"
 #include "list.cpp"
 #include "Client.h"
+#include "Client.cpp"
 
 #include <string.h>
 #include <sys/types.h>
@@ -72,7 +73,7 @@ Server::Server() {
     /* ---------------- listen() ---------------- */
 
     listen(client, 5);
-    cout << "Escuchado";
+    cout << "Escuchado"<<endl;
     //accept(client, (struct sockaddr *) &server_addr, &size);
     //se mantiene escuchando aqui hasta que se conecte algun cliente
 }
@@ -85,24 +86,16 @@ void Server::aceptarEimprimir() {
     while (1) {
 
         c = new Client();
-
-       // int clientCount = 1;
-
-        cout<<"inicio : "<<c->sock<<endl<<endl<<endl;
-        c->sock = accept(client, (struct sockaddr *) &server_addr, &size);
-        //cout << "cliente: "<<client << endl;
-         cout<<"final : "<<c->sock<<endl<<endl<<endl;
-        cout<<"cliente : "<<c->sock<<endl<<endl<<endl;
-
+       
+        c->sock = accept(client, (struct sockaddr *) &server_addr, &size);//acepta al cliente que hace la peticion
+       
         // first check if it is valid or not
         if (c->sock < 0) {
             cout << "=> Error on accepting..." << endl;
         } else {
-
-          
+            //crea el nuevo thread que manejara al nuevo cliente
             pthread_t thread_id;
             pthread_create( &thread_id , NULL ,  playSocket , (void*) &c->sock );         
-
         }
     }
 }
@@ -114,12 +107,7 @@ void* Server::playSocket(void* socket_desc){
     int read_size;
     char *message , client_message[1024];
 
-
-    //Send some messages to the client
-    message = "Greetings! I am your connection handler\n";
-    write(sock , message , strlen(message));
-
-    message = "Now type something and i shall repeat what you type \n";
+    message = "Aceptado";
     write(sock , message , strlen(message));
 
     //Receive a message from client
@@ -131,6 +119,7 @@ void* Server::playSocket(void* socket_desc){
         
         //verifica las llaves que hay, y la que no esta pero le sigue a la ultima sera la nueva llave
 
+        //hagarrar el mensaje y dividirlo por las comas que hay
         string sizeMensaje = to_string(sizeof(client_message));
         cout<<"tamano del mensaje: "<<sizeMensaje<<endl;
         string strclient_message=string(client_message);

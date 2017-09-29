@@ -13,6 +13,8 @@
 #include "list.h"
 #include "list.cpp"
 
+//list<string> listaContr; // estructura de control, lista global
+
 using  namespace std;
 ////////////////////////////////////////
 //estrucura de control
@@ -105,71 +107,86 @@ int rmlib::socketClient() {
     /* ---------- CONNECTING THE SOCKET ---------- */
     /* ---------------- connect() ---------------- */
 
-    if (connect(client, (struct sockaddr *) &server_addr, sizeof(server_addr)) == 0)
+    if (connect(client, (struct sockaddr *) &server_addr, sizeof(server_addr)) == 0){
         cout << "=> Connection to the server port number: " << portNum << endl;
+    }else{
+        cout <<"servidor no conectado"<<endl;
+    }
 
 
     cout << "=> Awaiting confirmation from the server..." << endl; //line 40
     recv(client, buffer, bufsize, 0);
+    
     cout << "=> Connection confirmed, you are good to go..." << endl;
 
 }
 
 int rmlib::enviarDato(char* dato){
-    cout<<"enviando dato"<<endl;
+    
 
-    if (socketActuar(dato)==false){
-        cout<<"Conectandose al servidor Pasivo"<<endl;
-        portAvailable=portPasivo;
-        cout<<"Conectandose al servidor Pasivo"<<endl;
+    cout<<"Comunicando con el servidor Activo"<<endl;
+    if (socketActuar(dato)==1){
+        cout<<"Exito!, libreria y servidor Activo han intercambiado datos exitosamente"<<endl<<endl<<endl;
+        return 1;
+    }
+
+    else{
+        cout<<"Servidor Activo desconectado"<<endl;
+            
+        cout<<"Intentando conectar al servidor Pasivo..."<<endl;
+        portAvailable=portPasivo; //cambia el puerto disponible (pasivo a activo)            
         socketClient();
-        cout<<"Conectandodo al Pasivo"<<endl;
-        if (socketActuar(dato)==false)
-            cout<<"Ningun servidor esta activo"<<endl;
+            
+        cout<<"Comunicando con el servidor Pasivo"<<endl;
+        if (socketActuar(dato)==1){                
+            cout<<"Exito!, libreria y servidor Pasivo han intercambiado datos exitosamente"<<endl;
+            return 1;}
 
-    } else
-    cout<<"Conectandose al servidor Activo"<<endl;
-        socketActuar(dato);
+        else{
+            cout<<"Ningun servidor esta activo"<<endl;
+            return 0;
+            }
+
+                
+    }
+        
+        
 
 }
 int rmlib::socketActuar(char* dato){
 
-    //do {
         cout << "Client: ";
         //cin >> buffer;
 
         //send(client, dato, bufsize, 0);
 
         write(client , dato , strlen(dato));
+        cout << "Tamano del dato antes de enviar: "<<strlen(dato)<<endl<<endl;
+        
+        //Respuesta del server
         n=recv(client, buffer, bufsize, 0);
+
         if (n<=0){
             cerr <<"servidor desconectado"<<endl;
             cout << "servidor no conectado"<<endl;
 
-
-            return 0;}
-
-        cout << "Cl buffer: "<<buffer<<endl;
-        cout << "Cl bufsize: "<<bufsize<<endl;
+            return 0;
+        }
         
-    //}while(true);
+        string llaveEnServer=buffer;
+
+        cout<<"Llave en server: "<<buffer<<endl;
+        cout << "Tamano del dato enviado: "<<bufsize<<endl;
 
 
+        //guardar buffer(llave) en la estructura de control
+        
+        cout<<endl<<"__La conexion fue exitosa__"<<endl<<endl;
 
 
-    /* ---------------- CLOSE CALL ------------- */
-    /* ----------------- close() --------------- */
-
-    /*
-        Once the server presses # to end the connection,
-        the loop will break and it will close the server
-        socket connection and the client connection.
-    */
-
-    cout << "\n=> Connection terminated.\nGoodbye...\n";
-
-    close(client);
-    return 0;
+        
+    //close(client);
+    return 1;
 }
 
 
