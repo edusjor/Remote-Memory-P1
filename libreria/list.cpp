@@ -346,7 +346,7 @@ void List<T>::search(T data_)
 }*/
 
 
-
+/*
 // Buscar el dato de un nodo por llave y muestra el valor y size
 template<typename T>
 void List<T>::searchIndex(T data_)
@@ -373,8 +373,76 @@ void List<T>::searchIndex(T data_)
     }
     cout << endl << endl;
 }
+*/
 
-// Buscar el dato de un nodo por llave y retorna el valor y size
+
+//(lib) Buscar todas las llaves iguales a la del parametro y retorna sus indices
+template<typename T>
+string List<T>::searchIndexes(T data_)
+{
+   /* Node<T> *temp = m_head;
+    int cont = 1;
+    int cont2 = 0;
+
+    string posiciones="";
+
+    while (temp) {
+        if (temp->llave == data_) {//si la llave guardada es igual a la que le llega
+            cout << "El dato se encuentra en la posición: " << cont << endl;
+            posiciones+=to_string(cont);
+            posiciones+="#";
+            cont2++;
+        }
+        temp = temp->next;
+        cont++;
+    }
+
+    if (cont2 == 0) {
+        cout << "No existe el dato " << endl;
+        return "no existe el dato";
+    }else{
+        return posiciones;
+    }
+    cout << endl << endl;*/
+}
+
+
+
+
+//(lib) Buscar todas las llaves iguales a la del parametro y retorna sus datos(llaves del server)
+template<typename T>
+string List<T>::searchallKeys(T data_)
+{
+    Node<T> *temp = m_head;
+    int cont = 1;
+    int cont2 = 0;
+
+    string Datos="";
+
+    while (temp) {
+        if (temp->llave == data_) {//si la llave guardada es igual a la que le llega
+            //cout << "El dato se encuentra en la posición: " << cont << endl;
+            Datos+=temp->valor;
+            Datos+="#";
+            cont2++;
+        }
+        temp = temp->next;
+        cont++;
+    }
+
+    if (cont2 == 0) {
+        cout << "No existe el dato " << endl;
+        return "no existe el dato";
+    }else{
+        return Datos;
+    }
+    cout << endl << endl;
+}
+
+
+
+
+// Buscar el dato de un nodo por llave y retorna el valor 
 template<typename T>
 string List<T>::searchData(T data_)
 {
@@ -384,10 +452,8 @@ string List<T>::searchData(T data_)
 
     while (temp) {
         if (temp->llave == data_) {
-            //cout << "El dato se encuentra en la posición: " << cont << endl;
-            //cout << "El dato guardado es: " << temp->valor << endl;
-            //cout << "El size del dato es : " << temp->size << endl;
-            return temp->valor+"#"+temp->size;
+
+            return temp->valor;  // retorna solo el valor que va a ser la llave que busca el dato en el server
             
             cont2++;
         }

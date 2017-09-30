@@ -23,9 +23,10 @@ using namespace std;
 
 
 rmlib* rmlib1;
-
+List<string>  list1;
 
 int Calculadora::guiOperacion(string operacion){
+    list1.add_head("1","2","3");
     int num1;
     int num2;
     cout <<"Digite el primer numero: "<<endl<<endl;
@@ -41,18 +42,25 @@ int Calculadora::guiOperacion(string operacion){
         string valor=to_string(num1+num2);
         string size=to_string(sizeof(valor));
 
+        cout<<"por aqui pasa 1"<<endl;
 
         string parametros = oper+"#"+llave+"#"+valor+"#"+size;
         char *chrParametros = &parametros[0u]; //convierte string a char
 
         string llaveDelServer=rmlib1->enviarDato(chrParametros);
+        cout<<"por aqui pasa 1.5"<<endl;
         if (llaveDelServer=="0"){
             cout<<"error, servidores desconectados"<<endl;
         }
+        else{cout<<"por aqui pasa 2"<<endl;
+            rmlib1->savellaveEnListaLocal("sumas",llaveDelServer); //guarda la llave del server con una llave local
+            cout<<"por aqui pasa 3"<<endl;
+        }
 
-        cout<<llaveDelServer<<endl;
-
-        //hacer una igualdar con lo anterior para recibir la respuesta
+        //rmlib1->savellaveEnListaLocal("sumas",llaveDelServer);
+        cout<<"\nllave sumas: "<<rmlib1->getAllLlavesDelServerEnLocal("sumas")<<endl<<endl;
+        
+        
 
         interfaz();
 
@@ -83,12 +91,49 @@ int Calculadora::division() {
     guiOperacion("/");
     return 0;
 }
+
+//muestra todas las sumas anteriores
 void Calculadora::mostrarPrevSumas(){
-    cout<<"Estas son todas las operaciones de suma anteriores: "<<endl;
-    //traer todas las anteriores sumas
+ 
+    string keysDeSumas="";  //guarda todas las keys del servidor guardadas en local en la llave "sumas"
+  
+    keysDeSumas = rmlib1->getAllLlavesDelServerEnLocal("sumas"); //string con todas las llaves de la llave "sumas" //LOCAL
+    cout<<"\nllavesServer en llaveLocal sumas: "<<keysDeSumas<<endl<<endl;
+    
+    string sumasPreviasDelServer = getValores(keysDeSumas);//llama la funcionLocal para que traiga los valores de las llavesServer del server en un solo string        
+
+    cout<<"Todas los resultados de sumas anteriores: "<<sumasPreviasDelServer<<endl<<endl;
+    cout<<"--------------------------------------------------------------------------- "<<endl;
+
     interfaz();
 
 }
+
+//recibe las llaves del servidor guardadas en local en string con separador: "#"
+//retorna los datos de las llaves en servidor, en string con mismo separador
+string Calculadora::getValores(string keysDeOperacion){
+    string datosDelServer="";
+    string separador="#";
+    string key="";
+
+    for(int i=0; i<keysDeOperacion.length(); i++){
+            
+
+        if ((keysDeOperacion[i])==separador[0]){
+               
+            char *chrKey = &key[0u]; //convierte string a char la llave q se mandara al server
+
+            datosDelServer+="=>"+rmlib1->getDato(chrKey);//envia la llave a la funcion en rmlib para que retorne el valor guardado en server
+            key="";
+        }
+        else{
+            key=key+keysDeOperacion[i];
+        }
+    }
+    return datosDelServer;
+}
+
+
 int Calculadora::interfaz(){
     cout << "1-Suma"<<endl;
     cout << "2-Restar"<<endl;

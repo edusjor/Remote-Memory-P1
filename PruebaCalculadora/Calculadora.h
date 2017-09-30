@@ -34,8 +34,10 @@ private:
     int division();
 
     void mostrarPrevSumas();
+    string getValores(string keysDeOperacion);
 
     int guiOperacion(string);
+
     int interfaz();
 
 

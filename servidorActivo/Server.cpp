@@ -84,11 +84,11 @@ void Server::aceptarEimprimir() {
 
 
     while (1) {
-
+        
         c = new Client();
-       
+       cout << "aqui 1"<<endl;
         c->sock = accept(client, (struct sockaddr *) &server_addr, &size);//acepta al cliente que hace la peticion
-       
+       cout << "aqui 2"<<endl;
         // first check if it is valid or not
         if (c->sock < 0) {
             cout << "=> Error on accepting..." << endl;
@@ -161,12 +161,13 @@ void* Server::playSocket(void* socket_desc){
             string llave=to_string(nummRandom); //llave aleatoria creada en el server
 
             list_1.add_head(llave,valor,size);   //guarda la llave, el valor y tamano del dato
-            list_1.print(); 
-            list_1.searchIndex(llave);
+            //list_1.print(); 
+            //list_1.searchIndex(llave);
             
             char *chrLlave = &llave[0u]; //convierte la llave de string a char
 
             write(sock , chrLlave , strlen(chrLlave)); //envia la llave creada al cliente
+ 
 
             cout<<"//////////////////////////////////////////////"<<endl;
             cout << "Llave creada: "<<llave<<endl;

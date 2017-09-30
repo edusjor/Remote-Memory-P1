@@ -13,7 +13,7 @@
 #include "list.h"
 #include "list.cpp"
 
-//list<string> listaContr; // estructura de control, lista global
+List<string> list_1; //lista global de estructura de control en libreria
 
 using  namespace std;
 ////////////////////////////////////////
@@ -30,8 +30,14 @@ public:
 
     int socketClient();
     void rm_init(char* ip, int port, char* ipHA, int portHA);
-    int enviarDato(char* dato);
-    string getDato(char* llave);
+    string enviarDato(char* dato);
+    //string getDato(char* llave);
+
+    string savellaveEnListaLocal(string llaveLocal,string llaveDelServer);
+    string getLlaveDelServerEnLocal(string llaveLocal);
+    string getAllLlavesDelServerEnLocal(string);
+    string getDato(string llave);
+
 private:
     char* ipActivo;
     char* ipPasivo;
@@ -49,7 +55,7 @@ private:
     char buffer[2000];
 
 
-    int socketActuar(char*  dato);
+    string socketActuar(char*  dato);
 };
 
 
@@ -122,13 +128,16 @@ int rmlib::socketClient() {
 
 }
 
-int rmlib::enviarDato(char* dato){
+string rmlib::enviarDato(char* dato){
     
 
     cout<<"Comunicando con el servidor Activo"<<endl;
-    if (socketActuar(dato)==1){
+
+    string llaveDelServer = socketActuar(dato);
+
+    if (llaveDelServer!="0"){
         cout<<"Exito!, libreria y servidor Activo han intercambiado datos exitosamente"<<endl<<endl<<endl;
-        return 1;
+        return llaveDelServer;
     }
 
     else{
@@ -139,13 +148,14 @@ int rmlib::enviarDato(char* dato){
         socketClient();
             
         cout<<"Comunicando con el servidor Pasivo"<<endl;
-        if (socketActuar(dato)==1){                
+        string llaveDelServer = socketActuar(dato);
+        if (llaveDelServer!="0"){                
             cout<<"Exito!, libreria y servidor Pasivo han intercambiado datos exitosamente"<<endl;
-            return 1;}
+            return llaveDelServer;}
 
         else{
             cout<<"Ningun servidor esta activo"<<endl;
-            return 0;
+            return "0";
             }
 
                 
@@ -154,7 +164,7 @@ int rmlib::enviarDato(char* dato){
         
 
 }
-int rmlib::socketActuar(char* dato){
+string rmlib::socketActuar(char* dato){
 
         cout << "Client: ";
         //cin >> buffer;
@@ -170,7 +180,7 @@ int rmlib::socketActuar(char* dato){
         if (n<=0){
             cerr <<"servidor desconectado"<<endl;
             cout << "servidor no conectado"<<endl;
-            return 0;
+            return "0";
         }
         
         string llaveEnServer=buffer;
@@ -186,12 +196,26 @@ int rmlib::socketActuar(char* dato){
 
         
     //close(client);
-    return 1;
+    return llaveEnServer;
 }
 
-string rmlib::getDato(char* llave){
-    write(client , llave , strlen(llave));
+//para hacer peticion al server se manda: operacion a realizar, llave, valor, tamano.
+//retorna el valor asociado a la llave
+string rmlib::getDato(string llave){
+
+
+    string operacion="getValor#";
+    string datosize= "#null#null";
+    string param=operacion+llave+datosize;
+
+    char *chrParam = &param[0u]; //convierte string a char
+
+    
+
+
+    write(client , chrParam , strlen(chrParam));
     //Respuesta del server
+ 
     n=recv(client, buffer, bufsize, 0);
 
     if (n<=0){
@@ -207,5 +231,34 @@ string rmlib::getDato(char* llave){
     return valorEnServer;
 }
 
+//guarda la llave proveida por el servidor en la variable dato segun una llave local
+string rmlib::savellaveEnListaLocal(string llaveLocal,string llaveDelServer){
+    list_1.add_head(llaveLocal,llaveDelServer,"null");
+
+}
+
+//busca segun una llave local, la llave del server guardada en la lista local
+string rmlib::getLlaveDelServerEnLocal(string llaveLocal){
+    string dato = list_1.searchData(llaveLocal);
+    if (dato!="0"){
+        return dato;
+    }
+    return "0"; //no existe esa llave en local
+}
+
+//busca segun una llave local, la llave del server guardada en la lista local
+string rmlib::getAllLlavesDelServerEnLocal(string llaveLocal){
+    string llaves = list_1.searchallKeys(llaveLocal);
+    if (llaves!="0"){
+        return llaves;
+    }
+    return "0"; //no existe esa llave en local
+}
+
+
+/*
+string rmlib::buscarIndicesDeLlave(string llaveLocal){
+
+}*/
 
 #endif //PRUEBACALCULADORA_RMLIB_H

@@ -50,7 +50,9 @@ class List
         void load_file(string);
         void print();
         void save_file(string);
-        void searchIndex(T);  //busca un dato para imprimirlo
+        string searchIndexes(T);  //busca llaves iguales a un parametro y retorna los indices
+        string searchallKeys(T data_); //busca llaves iguales a un parametro y retorna todos los datos asociados
+        //string searchallData(T data_); //Busca todos los datos del string de llaves
         string searchData(T); //busca un dato por llave para retornarlo junto con su tamano
         void sort();
 

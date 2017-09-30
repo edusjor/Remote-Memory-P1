@@ -31,10 +31,13 @@ public:
     int socketClient();
     void rm_init(char* ip, int port, char* ipHA, int portHA);
     string enviarDato(char* dato);
-    string getDato(char* llave);
+    //string getDato(char* llave);
 
     string savellaveEnListaLocal(string llaveLocal,string llaveDelServer);
     string getLlaveDelServerEnLocal(string llaveLocal);
+    string getAllLlavesDelServerEnLocal(string);
+    string getDato(string llave);
+
 private:
     char* ipActivo;
     char* ipPasivo;
@@ -196,9 +199,23 @@ string rmlib::socketActuar(char* dato){
     return llaveEnServer;
 }
 
-string rmlib::getDato(char* llave){
-    write(client , llave , strlen(llave));
+//para hacer peticion al server se manda: operacion a realizar, llave, valor, tamano.
+//retorna el valor asociado a la llave
+string rmlib::getDato(string llave){
+
+
+    string operacion="getValor#";
+    string datosize= "#null#null";
+    string param=operacion+llave+datosize;
+
+    char *chrParam = &param[0u]; //convierte string a char
+
+    
+
+
+    write(client , chrParam , strlen(chrParam));
     //Respuesta del server
+ 
     n=recv(client, buffer, bufsize, 0);
 
     if (n<=0){
@@ -229,5 +246,19 @@ string rmlib::getLlaveDelServerEnLocal(string llaveLocal){
     return "0"; //no existe esa llave en local
 }
 
+//busca segun una llave local, la llave del server guardada en la lista local
+string rmlib::getAllLlavesDelServerEnLocal(string llaveLocal){
+    string llaves = list_1.searchallKeys(llaveLocal);
+    if (llaves!="0"){
+        return llaves;
+    }
+    return "0"; //no existe esa llave en local
+}
+
+
+/*
+string rmlib::buscarIndicesDeLlave(string llaveLocal){
+
+}*/
 
 #endif //PRUEBACALCULADORA_RMLIB_H
