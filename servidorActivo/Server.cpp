@@ -130,7 +130,7 @@ void* Server::playSocket(void* socket_desc){
 
         int cont=0;
         string separador="#";
-
+        cout<<"leenn: "<<strclient_message.length()<<endl;
         for(int i=0; i<strclient_message.length(); i++){
             
             if ((strclient_message[i])==separador[0]){
@@ -171,15 +171,20 @@ void* Server::playSocket(void* socket_desc){
 
             cout<<"//////////////////////////////////////////////"<<endl;
             cout << "Llave creada: "<<llave<<endl;
-            cout <<"Valor: "<<valor<<endl;
+            cout << "Valor: "<<valor<<endl;
             cout << "Size of valor: "<< sizeof(size) <<endl; 
         }
+
+
+
         //getValor
         if (operacion==operacion2){ 
             string datoRetornado=list_1.searchData(llave);
+            cout<<"dato retornado: "<<datoRetornado<<endl;
             if (datoRetornado!="0"){
                 char *chrDato = &datoRetornado[0u]; //convierte el dato de string a char
                 write(sock , chrDato , strlen(chrDato)); //envia el dato pedido por llave al cliente
+                cout<<"dato enviado al cliente: "<<chrDato<<endl;
                 //clear the message buffer
             }
             else{

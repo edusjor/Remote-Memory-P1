@@ -207,7 +207,7 @@ string rmlib::getDato(string llave){
     string operacion="getValor#";
     string datosize= "#null#null";
     string param=operacion+llave+datosize;
-
+    cout<<"param: "<<param<<endl;
     char *chrParam = &param[0u]; //convierte string a char
 
     
@@ -215,8 +215,10 @@ string rmlib::getDato(string llave){
 
     write(client , chrParam , strlen(chrParam));
     //Respuesta del server
- 
+    cout<<"Llaveeee: "<<chrParam<<endl;
+    memset(buffer, 0, 1024);
     n=recv(client, buffer, bufsize, 0);
+    cout << "buffer: "<< buffer<<endl;
 
     if (n<=0){
         cerr <<"servidor desconectado"<<endl;
