@@ -3,19 +3,11 @@
 //
 
 #include "Server.h"
-
-
-#include <iostream>
-
-
-//#include "list.h"
-//#include "list.cpp"
-
 #include "ListaGenerica.h"
-
 #include "Client.h"
 #include "Client.cpp"
 
+#include <iostream>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -27,16 +19,10 @@
 #include <cstdlib>
 
 
+
 List<string> list_1; //lista global
 int usoDeMemoria=0;
 Server::Server() {
-
-    string numero = "1234";
-    int num =atoi(numero.c_str()); // convierte string a entero
-    cout<<"numero: "<<num+2<<endl;
-
-    //list_1.add_head(321123);
-    //list_1.print();
 
     int yes = 1;
 
@@ -44,7 +30,7 @@ Server::Server() {
     /* --------------- socket() function ------------------*/
 
     client = socket(AF_INET, SOCK_STREAM, 0);
-    //Client *c;
+    
     if (client < 0) {
         cout << "\nError establishing socket..." << endl;
         exit(1);
@@ -65,47 +51,43 @@ Server::Server() {
 
     if ((bind(client, (struct sockaddr *) &server_addr, sizeof(server_addr))) < 0) {
         cout << "=> Error binding connection, the socket has already been established..." << endl;
-        //return -1;
     }
 
-
-    //size = sizeof(server_addr);
     cout << "=> Looking for clients..." << endl;
 
     /* ------------- LISTENING CALL ------------- */
     /* ---------------- listen() ---------------- */
 
     listen(client, 5);
-    cout << "Escuchado"<<endl;
-    //accept(client, (struct sockaddr *) &server_addr, &size);
-    //se mantiene escuchando aqui hasta que se conecte algun cliente
 }
 
 
 Client *c;
 void Server::aceptarEimprimir() {
 
-
     while (1) {
         
-        c = new Client();
-       cout << "aqui 1"<<endl;
-        c->sock = accept(client, (struct sockaddr *) &server_addr, &size);//acepta al cliente que hace la peticion
-       cout << "aqui 2"<<endl;
+        c = new Client(); //reserva un nuevo "espacio" para el siguiente cliente que se conecte
+
+        //espera aqui hasta que algun cliente se conecte entonces lo acepta y lo asigna al espacio reservado
+        c->sock = accept(client, (struct sockaddr *) &server_addr, &size); 
+
         // first check if it is valid or not
         if (c->sock < 0) {
             cout << "=> Error on accepting..." << endl;
-        } else {
-            //crea el nuevo thread que manejara al nuevo cliente
+        } 
+        else {
+            //crea el nuevo thread que manejara al nuevo cliente y sigue en el loop esperando nuevos clientes
             pthread_t thread_id;
             pthread_create( &thread_id , NULL ,  playSocket , (void*) &c->sock );         
         }
     }
 }
 
-//entra aqui por cada nueva conexion
+//Entra aqui por cada nueva conexion con un cliente
+//Aqui se maneja todas las peticiones del cliente
 void* Server::playSocket(void* socket_desc){
-//Get the socket descriptor
+
     int sock = *(int*)socket_desc;
     int read_size;
     char *message , client_message[1024];
@@ -119,22 +101,18 @@ void* Server::playSocket(void* socket_desc){
 
         //end of string marker
         client_message[read_size] = '\0';
-        cout <<endl<<endl<< "Mensaje del cliente: "<<client_message<<endl;
+        cout <<endl<<endl<< "Mensaje recibido del cliente: "<<client_message<<endl;
         
         
 
         //itera el string del char recibido en el mensaje 
         //para separar la llave, el valor y el tamano
-        string strclient_message=string(client_message);
-        string operacion;
-        string llave;
-        string valor;
-        string size;
-
+        string strclient_message = string(client_message); //convierte el mensaje del cliente a string
+        string operacion="",llave="",valor="",size="" ;
+        
         int cont=0;
         string separador="#";
-        cout<<"leenn: "<<strclient_message.length()<<endl;
-        for(int i=0; i<strclient_message.length(); i++){
+        for(int i=0; i < strclient_message.length(); i++){
             
             if ((strclient_message[i])==separador[0]){
                 cont+=1;
@@ -151,25 +129,22 @@ void* Server::playSocket(void* socket_desc){
 
                 if(cont==3)
                     size=size+strclient_message[i];
-            }
-        memset(client_message, 0, 1024);
-        
+            }        
         }
 
         string operacion1="guardarValor";
         string operacion2="getValor";
         string operacion3="getMemoryUsage";
-        string operacion4="getAllMemoryValue";
+        string operacion4="getAllMemoryValues";
 
+        ////////////////////////////////////////
         //guardarValor
         if(operacion==operacion1){ 
-
+            //rev
             int nummRandom=rand();
-            string llave=to_string(nummRandom); //llave aleatoria creada en el server
+            string llave=to_string(nummRandom); //llave aleatoria numerica creada en el server se pasa a string
 
             list_1.add_head(llave,valor,size);   //guarda la llave, el valor y tamano del dato
-            //list_1.print(); 
-            //list_1.searchIndex(llave);
             
             char *chrLlave = &llave[0u]; //convierte la llave de string a char
 
