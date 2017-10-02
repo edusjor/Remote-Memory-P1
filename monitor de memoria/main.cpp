@@ -15,31 +15,27 @@
  * Inc., 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef NODE_H
-#define NODE_H
-
 #include <iostream>
+
+#include "Monitor De Memoria.h"
+#include "Monitor De Memoria.cpp"
 
 using namespace std;
 
-template <class T>
 
-class Node
-{
-    public:
-        Node();
-        Node(T,T,T);
-        ~Node();
 
-        Node *next;
-        //T data;
+int main() {
+	new Monitor_De_Memoria();
 
-        T llave;
-        T valor;
-        T size;
-
-        void delete_all();
-        void print();
 };
 
-#endif // NODE_H
+
+
+
+
+
+
+
+
+
+

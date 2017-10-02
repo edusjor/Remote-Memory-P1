@@ -2,25 +2,15 @@
 // Created by edulubu on 03/09/17.
 //
 
-#include <string.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <thread>
+
 #include "rmlib.h"
-
-
+#include "Calculadora.h"
 
 #include <iostream>
 #include <unistd.h>
-#include "Calculadora.h"
+#include <string.h>
 
 using namespace std;
-
-
 
 rmlib* rmlib1;
 List<string>  list1;
@@ -193,7 +183,6 @@ int Calculadora::interfaz(){
 Calculadora::Calculadora()  {
     //iniciar socket
     char* ip = "127.0.0.1";
-//rmlib* rmlib1;
     
     rmlib1 = new rmlib();
 

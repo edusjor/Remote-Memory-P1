@@ -87,6 +87,8 @@ void Server::aceptarEimprimir() {
 //Entra aqui por cada nueva conexion con un cliente
 //Aqui se maneja todas las peticiones del cliente
 void* Server::playSocket(void* socket_desc){
+    string clientKeysControl=""; //string que lleva el conteo de llaves creadas por este cliente.
+    string separador="#";
 
     int sock = *(int*)socket_desc;
     int read_size;
@@ -95,15 +97,20 @@ void* Server::playSocket(void* socket_desc){
     message = "Aceptado";
     write(sock , message , strlen(message));
 
+
+
+
+
+
+
+
+
     //Receive a message from client
     while( (read_size = recv(sock , client_message , 1024 , 0)) > 0 )
     {
-
         //end of string marker
         client_message[read_size] = '\0';
         cout <<endl<<endl<< "Mensaje recibido del cliente: "<<client_message<<endl;
-        
-        
 
         //itera el string del char recibido en el mensaje 
         //para separar la llave, el valor y el tamano
@@ -111,7 +118,6 @@ void* Server::playSocket(void* socket_desc){
         string operacion="",llave="",valor="",size="" ;
         
         int cont=0;
-        string separador="#";
         for(int i=0; i < strclient_message.length(); i++){
             
             if ((strclient_message[i])==separador[0]){
@@ -132,54 +138,59 @@ void* Server::playSocket(void* socket_desc){
             }        
         }
 
+
+
+
+
+
         string operacion1="guardarValor";
         string operacion2="getValor";
         string operacion3="getMemoryUsage";
         string operacion4="getAllMemoryValues";
 
+
+
+
         ////////////////////////////////////////
         //guardarValor
+        //Guarda en la lista una la aleatoria, el valor y el tamano proveidas en el buffer
         if(operacion==operacion1){ 
-            //rev
-            int nummRandom=rand();
-            string llave=to_string(nummRandom); //llave aleatoria numerica creada en el server se pasa a string
 
-            list_1.add_head(llave,valor,size);   //guarda la llave, el valor y tamano del dato
-            
-            char *chrLlave = &llave[0u]; //convierte la llave de string a char
-
-            write(sock , chrLlave , strlen(chrLlave)); //envia la llave creada al cliente
- 
-
-            cout<<"//////////////////////////////////////////////"<<endl;
+            int nummRandom=rand();                      //crea un numero random
+            string llave=to_string(nummRandom);         //llave aleatoria numerica creada en el server, se pasa a string
             cout << "Llave creada: "<<llave<<endl;
-            cout << "Valor: "<<valor<<endl;
-            cout << "Size of valor: "<< sizeof(valor) <<endl; 
+            clientKeysControl+=(llave+separador);         //concatena a la variable de control de llaves de este usuario la nueva llave creada
 
-            
-            usoDeMemoria+=sizeof(valor);
-            memset(chrLlave, 0, 1024);
-        
+            list_1.add_head(llave,valor,size);          //guarda en la lista la llave, el valor y tamano del dato
+
+            char *chrLlave = &llave[0u];                //convierte la llave de string a char
+            write(sock , chrLlave , strlen(chrLlave));  //envia la llave creada al cliente
+            usoDeMemoria+=(sizeof(valor))/4;            //Le suma a una variable de control de memoria el tamano del valor guardado
         }
 
 
 
 
+
+
+
+
+
+        ////////////////////////////////////////
         //getValor
+        //Busca en la lista el dato guardado en la llave proveida por el cliente y lo envia
         if (operacion==operacion2){ 
-            string datoRetornado=list_1.searchData(llave);
-            cout<<"dato retornado: "<<datoRetornado<<endl;
-            if (datoRetornado!="0"){
-                char *chrDato = &datoRetornado[0u]; //convierte el dato de string a char
-                write(sock , chrDato , strlen(chrDato)); //envia el dato pedido por llave al cliente
+            string datoRetornado=list_1.searchData(llave);          //busca el dato y lo asigna a una variable
+            
+            if (datoRetornado!="false"){
+                char *chrDato = &datoRetornado[0u];                 //convierte el dato de string a char
+                write(sock , chrDato , strlen(chrDato));            //envia el dato pedido por llave al cliente
                 cout<<"dato enviado al cliente: "<<chrDato<<endl;
-                //clear the message buffer
             }
             else{
                 string msj="NoDataFound";
-                char *chrMsj = &msj[0u]; //convierte el dato de string a char
-                write(sock , chrMsj , strlen(chrMsj)); //envia el dato pedido por llave al cliente
-
+                char *chrMsj = &msj[0u];                            //convierte el dato de string a char
+                write(sock , chrMsj , strlen(chrMsj));              //envia el memsaje de dato no encontrado al cliente
             }
         }
 
@@ -188,21 +199,20 @@ void* Server::playSocket(void* socket_desc){
 
 
 
+
+
+
+
+        ////////////////////////////////////////
         //getMemoryUsage
+        //envia al cliente el uso de memoria actual, en bytes
         if (operacion==operacion3){ 
 
-                string strUsoDeMemoria=to_string(usoDeMemoria);
-                cout<<"Dato enviado al cliente MemoryUsage: "<<strUsoDeMemoria<<endl;
-                char *chrDato = &strUsoDeMemoria[0u]; //convierte el dato de string a char
-                write(sock , chrDato , strlen(chrDato)); //envia el dato pedido por llave al cliente
-                cout<<"Dato enviado al cliente MemoryUsage: "<<chrDato<<endl;
-                memset(chrDato, 0, 1024); 
-
+                string str_UsoDeMemoria=to_string(usoDeMemoria)+" bytes";       //convierte a string la var de control de memoria
+                char *chrDato = &str_UsoDeMemoria[0u];                          //convierte de string a char
+                write(sock , chrDato , strlen(chrDato));                        //envia el dato de control de memoria al cliente
             }
-           
         }
-
-
         //clear the message buffer
         memset(client_message, 0, 1024);
         
@@ -216,6 +226,43 @@ void* Server::playSocket(void* socket_desc){
     {
         perror("recv failed");
     }
+
+
+
+
+
+
+
+
+
+
+
+    ///////////////////////////////////////////////
+    //Borra los datos guardados por el cliente
+    //si llega aqui ya se desconecto
+    /*string keyToClear="";
+    cout<<clientKeysControl<<endl;
+    for(int i=0; i < clientKeysControl.length(); i++){
+            
+        if ((clientKeysControl[i])==separador[0]){
+            list_1.del_by_data(keyToClear);         //elimina el nodo asociado a esa llave
+            usoDeMemoria-=4;                        //libera 4 bytes de la variable de control de uso de memoria
+            cout<<"llave: "<<keyToClear<<" vaciada"<<endl;
+            keyToClear="";                          //limpia la variable de la llave a eliminar porque ya se elimino en la linea anterior
+        }
+        else{
+            keyToClear+=clientKeysControl[i];
+        }        
+    }*/
+
+
+
+
+
+
+
+
+
 }
 
 

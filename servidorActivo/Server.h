@@ -18,15 +18,9 @@
 #include <netinet/in.h>
 #include "Client.h"
 
-
-//#include "mythread.h"
-//#include "client.h"
-
 #define PORT 30666
 
 using namespace std;
-
-
 
 class Server {
 
@@ -39,26 +33,16 @@ private:
     int bufsize = 1024;
     char buffer[1024];
 
-    
-
-
-
-
-
-
     struct sockaddr_in server_addr;
     socklen_t size;
 
-
-    //struct sockaddr_in serverAddr, clientAddr;
     char buff[1024];
+
+    static void* playSocket(void* var);
 
 public:
     Server();
     void aceptarEimprimir();
-    static void* playSocket(void* var);
-    
-
 };
 
 
