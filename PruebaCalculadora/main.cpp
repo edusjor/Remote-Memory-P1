@@ -40,7 +40,7 @@ using namespace std;
 int main() {
 	 new Calculadora();
 
-}
+};
 
 
 

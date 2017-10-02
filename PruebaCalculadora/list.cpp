@@ -280,16 +280,6 @@ void List<T>::invert()
         temp->next = prev;
         prev = temp;
         temp = next;
-    }
-    m_head = prev;
-}
-
-// Cargar una lista desde un archivo
-template<typename T>
-void List<T>::load_file(string file)
-{
-    T line;
-    ifstream in;
     in.open(file.c_str());
 
     if (!in.is_open()) {
@@ -515,4 +505,14 @@ void List<T>::save_file(string file)
 }
 
 template<typename T>
-List<T>::~List() {}
+List<T>::~List() {
+    
+    m_head = prev;
+}
+
+// Cargar una lista desde un archivo
+template<typename T>
+void List<T>::load_file(string file)
+{
+    T line;
+    ifstream in;
