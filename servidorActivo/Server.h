@@ -39,6 +39,8 @@ private:
     int bufsize = 1024;
     char buffer[1024];
 
+    int memoryUsage = 0;
+
 
 
 

@@ -37,6 +37,7 @@ public:
     string getLlaveDelServerEnLocal(string llaveLocal);
     string getAllLlavesDelServerEnLocal(string);
     string getDato(string llave);
+    string getAnythingFromServer(string request);
 
 private:
     char* ipActivo;
@@ -51,8 +52,8 @@ private:
 
     int client;
 
-    int bufsize = 2000;
-    char buffer[2000];
+    int bufsize = 1024;
+    char buffer[1024];
 
 
     string socketActuar(char*  dato);
@@ -257,7 +258,19 @@ string rmlib::getAllLlavesDelServerEnLocal(string llaveLocal){
     return "0"; //no existe esa llave en local
 }
 
+string rmlib::getAnythingFromServer(string request){
+    
+    char *chrParam = &request[0u]; //convierte string a char
 
+
+    write(client , chrParam , strlen(chrParam));
+    memset(buffer, 0, 1024);
+    n=recv(client, buffer, bufsize, 0);
+
+    string requestRespuesta=buffer;
+    return requestRespuesta;
+
+}
 /*
 string rmlib::buscarIndicesDeLlave(string llaveLocal){
 

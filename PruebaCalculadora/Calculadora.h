@@ -35,6 +35,8 @@ private:
 
     void mostrarPrevSumas();
     string getValores(string keysDeOperacion);
+    void MemoryUsage();
+    void getAllMemoryValue();
 
     int guiOperacion(string);
 

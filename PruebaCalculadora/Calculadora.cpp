@@ -133,6 +133,21 @@ string Calculadora::getValores(string keysDeOperacion){
     return datosDelServer;
 }
 
+void Calculadora::MemoryUsage(){
+    string getMemoryUsage = rmlib1->getAnythingFromServer("getMemoryUsage");
+    cout<<"uso de memoria: "<<getMemoryUsage<<endl;
+
+}
+
+//trae todos los valores guardados en memoria con sus llaves
+void Calculadora::getAllMemoryValue(){
+    
+    string AllMemoryValue = rmlib1->getAnythingFromServer("getAllMemoryValue");
+    cout<<"todos los datos y llaves en memoria: "<<AllMemoryValue<<endl<<endl;
+
+}
+
+
 
 int Calculadora::interfaz(){
     cout << "1-Suma"<<endl;
@@ -140,7 +155,8 @@ int Calculadora::interfaz(){
     cout << "3-Multiplicar"<<endl;
     cout << "4-Dividir"<<endl;
     cout << "5-Mostrar Previas Sumas"<<endl;
-    cout << "6-Salir"<<endl<<endl;
+    cout << "6-Salir"<<endl;
+    cout << "7-Memory Usage"<<endl<<endl;
 
 
     int choice;
@@ -163,8 +179,11 @@ int Calculadora::interfaz(){
         case 5:
             mostrarPrevSumas();
             break;
+
         case 6:
             exit(true);
+        case 7:
+            MemoryUsage();
 
     }
 

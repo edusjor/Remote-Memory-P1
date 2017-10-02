@@ -25,7 +25,7 @@
 
 
 List<string> list_1; //lista global
-
+int usoDeMemoria=0;
 Server::Server() {
 
     string numero = "1234";
@@ -149,10 +149,14 @@ void* Server::playSocket(void* socket_desc){
                 if(cont==3)
                     size=size+strclient_message[i];
             }
+        memset(client_message, 0, 1024);
+        
         }
 
         string operacion1="guardarValor";
         string operacion2="getValor";
+        string operacion3="getMemoryUsage";
+        string operacion4="getAllMemoryValue";
 
         //guardarValor
         if(operacion==operacion1){ 
@@ -172,8 +176,14 @@ void* Server::playSocket(void* socket_desc){
             cout<<"//////////////////////////////////////////////"<<endl;
             cout << "Llave creada: "<<llave<<endl;
             cout << "Valor: "<<valor<<endl;
-            cout << "Size of valor: "<< sizeof(size) <<endl; 
+            cout << "Size of valor: "<< sizeof(valor) <<endl; 
+
+            
+            usoDeMemoria+=sizeof(valor);
+            memset(chrLlave, 0, 1024);
+        
         }
+
 
 
 
@@ -194,9 +204,30 @@ void* Server::playSocket(void* socket_desc){
 
             }
         }
+
+
+
+
+
+
+        //getMemoryUsage
+        if (operacion==operacion3){ 
+
+                string strUsoDeMemoria=to_string(usoDeMemoria);
+                cout<<"Dato enviado al cliente MemoryUsage: "<<strUsoDeMemoria<<endl;
+                char *chrDato = &strUsoDeMemoria[0u]; //convierte el dato de string a char
+                write(sock , chrDato , strlen(chrDato)); //envia el dato pedido por llave al cliente
+                cout<<"Dato enviado al cliente MemoryUsage: "<<chrDato<<endl;
+                memset(chrDato, 0, 1024); 
+
+            }
+           
+        }
+
+
         //clear the message buffer
         memset(client_message, 0, 1024);
-    }
+        
 
     if(read_size == 0)
     {
@@ -208,4 +239,8 @@ void* Server::playSocket(void* socket_desc){
         perror("recv failed");
     }
 }
+
+
+
+
 ////////////////////////////////////////////////
