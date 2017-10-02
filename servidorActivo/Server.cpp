@@ -8,8 +8,11 @@
 #include <iostream>
 
 
-#include "list.h"
-#include "list.cpp"
+//#include "list.h"
+//#include "list.cpp"
+
+#include "ListaGenerica.h"
+
 #include "Client.h"
 #include "Client.cpp"
 

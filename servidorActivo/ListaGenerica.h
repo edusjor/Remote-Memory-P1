@@ -1,24 +1,125 @@
-/*
- * Copyright (C) 2009 Ronny Yabar Aizcorbe <ronnycontacto@gmail.com>
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms and conditions of the GNU Lesser General Public License,
- * version 2.1, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for
- * more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
- */
+//ListaGenerica.h
 
-#include "list.h"
+
+
+
+
+
+
+#ifndef LISTA_GENERICA_H
+#define LISTA_GENERICA_H
+
+#include <iostream>
+
+#include <fstream>
+//#include <string>
+//#include <stdlib.h>
 
 using namespace std;
 
+
+//////////////////////////////////////////////////////////////////////////////
+///////////// Clase Nodo ///////////////////////
+template <class T>
+class Node
+{
+    public:
+        Node();
+        Node(T,T,T);
+        ~Node();
+
+        Node *next;
+        //T data;
+
+        T llave;
+        T valor;
+        T size;
+
+        void delete_all();
+        void print();
+};
+
+//////////////////////////////////////////////////////////////////////////////
+///////////// Nodo ///////////////////////
+// Constructor por defecto
+template<typename T>
+
+Node<T>::Node()
+{
+    llave = NULL;
+    valor = NULL;
+    size = NULL;
+    next = NULL;
+}
+
+// Constructor por parámetro
+template<typename T>
+Node<T>::Node(T llave, T valor, T size)
+{
+	this->llave= llave;
+	this->valor= valor;
+	this->size=size;
+
+    //data = data_;
+    next = NULL;
+}
+
+// Eliminar todos los Nodos
+template<typename T>
+void Node<T>::delete_all()
+{
+    if (next)
+        next->delete_all();
+    delete this;
+}
+
+// Imprimir un Nodo
+template<typename T>
+void Node<T>::print()
+{
+    //cout << "Node-> " << "Dato: " << dato << " Direcion: " << this << " Siguiente: " << next << endl;
+    cout << llave << "-> ";
+}
+
+template<typename T>
+Node<T>::~Node() {}
+
+//////////////////////////////////////////////////////////////////////////////
+///////////// Clase Lista ///////////////////////
+template <class T>
+class List
+{
+    public:
+        List();
+        ~List();
+
+        void add_head(T,T,T); //Agrega a la lista
+        void add_end(T);
+        void add_sort(T);
+        void concat(List);
+        void del_all();
+        void del_by_data(T);
+        void del_by_position(int);
+        void fill_by_user(int);
+        void fill_random(int);
+        void intersection(List);
+        void invert();
+        void load_file(string);
+        void print();
+        void save_file(string);
+        string searchIndexes(T);  //busca llaves iguales a un parametro y retorna los indices
+        //string searchallData(T);
+        string searchData(T); //busca un dato por llave para retornarlo junto con su tamano
+        void sort();
+
+
+    private:
+        Node<T> *m_head;
+        int m_num_nodes;
+};
+
+//////////////////////////////////////////////////////////////////////////////
+///////////// Lista ///////////////////////
 // Constructor por defecto
 template<typename T>
 List<T>::List()
@@ -485,3 +586,35 @@ void List<T>::save_file(string file)
 
 template<typename T>
 List<T>::~List() {}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#endif // 
