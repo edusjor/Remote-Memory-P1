@@ -1,6 +1,6 @@
 //
 // Created by edulubu on 28/08/17.
-//Servidor Activo
+//ServidorPasivo
 
 #include "Server.h"
 #include "ListaGenerica.h"
@@ -22,7 +22,6 @@
 
 List<string> list_1; //lista global
 int usoDeMemoria=0;
-
 Server::Server() {
 
     int yes = 1;

@@ -1,24 +1,113 @@
-/*
- * Copyright (C) 2009 Ronny Yabar Aizcorbe <ronnycontacto@gmail.com>
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms and conditions of the GNU Lesser General Public License,
- * version 2.1, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for
- * more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
- */
+//ListaGenerica.h
 
-#include "list.h"
+#ifndef LISTA_GENERICA_H
+#define LISTA_GENERICA_H
+
+#include <iostream>
+#include <fstream>
 
 using namespace std;
 
+//////////////////////////////////////////////////////////////////////////////
+///////////// Clase Nodo ///////////////////////
+template <class T>
+class Node
+{
+    public:
+        Node();
+        Node(T,T,T);//llave,valor,size
+        ~Node();
+
+        Node *next;
+
+        T llave;
+        T valor;
+        T size;
+
+        void delete_all();
+        void print();
+};
+
+//////////////////////////////////////////////////////////////////////////////
+///////////// Nodo ///////////////////////
+// Constructor por defecto
+template<typename T>
+
+Node<T>::Node()
+{
+    llave = NULL;
+    valor = NULL;
+    size = NULL;
+    next = NULL;
+}
+
+// Constructor por parámetro
+template<typename T>
+Node<T>::Node(T llave, T valor, T size)
+{
+	this->llave= llave;
+	this->valor= valor;
+	this->size=size;
+
+    //data = data_;
+    next = NULL;
+}
+
+// Eliminar todos los Nodos
+template<typename T>
+void Node<T>::delete_all()
+{
+    if (next)
+        next->delete_all();
+    delete this;
+}
+
+// Imprimir un Nodo
+template<typename T>
+void Node<T>::print()
+{
+    cout << llave << "-> ";
+}
+
+template<typename T>
+Node<T>::~Node() {}
+
+//////////////////////////////////////////////////////////////////////////////
+///////////// Clase Lista ///////////////////////
+template <class T>
+class List
+{
+    public:
+        List();
+        ~List();
+
+        void add_head(T,T,T); //Agrega a la lista
+        void add_end(T);
+        void add_sort(T);
+        void concat(List);
+        void del_all();
+        void del_by_data(T);
+        void del_by_position(int);
+        void fill_by_user(int);
+        void fill_random(int);
+        void intersection(List);
+        void invert();
+        void load_file(string);
+        void print();
+        void save_file(string);
+        string searchIndexes(T);  //busca llaves iguales a un parametro y retorna los indices
+        //string searchallData(T);
+        string searchData(T); //busca un dato por llave para retornarlo junto con su tamano
+        void sort();
+
+
+    private:
+        Node<T> *m_head;
+        int m_num_nodes;
+};
+
+//////////////////////////////////////////////////////////////////////////////
+///////////// Lista ///////////////////////
 // Constructor por defecto
 template<typename T>
 List<T>::List()
@@ -109,7 +198,7 @@ void List<T>::del_all()
     m_head = 0;
 }
 
-// Eliminar por data del nodo
+// Eliminar por data(llave) del nodo
 template<typename T>
 void List<T>::del_by_data(T data_)
 {
@@ -118,11 +207,11 @@ void List<T>::del_by_data(T data_)
 
     int cont = 0;
 
-    if (m_head->data == data_) {
+    if (m_head->llave == data_) {
         m_head = temp->next;
     } else {
         while (temp1) {
-            if (temp1->data == data_) {
+            if (temp1->llave == data_) {
                 Node<T> *aux_node = temp1;
                 temp->next = temp1->next;
                 delete aux_node;
@@ -321,66 +410,11 @@ void List<T>::print()
 
 
 
-/*
-// Buscar el dato de un nodo
-template<typename T>
-void List<T>::search(T data_)
-{
-    Node<T> *temp = m_head;
-    int cont = 1;
-    int cont2 = 0;
-
-    while (temp) {
-        if (temp->llave == data_) {
-            cout << "El dato se encuentra en la posición: " << cont << endl;
-            cont2++;
-        }
-        temp = temp->next;
-        cont++;
-    }
-
-    if (cont2 == 0) {
-        cout << "No existe el dato " << endl;
-    }
-    cout << endl << endl;
-}*/
-
-
-/*
-// Buscar el dato de un nodo por llave y muestra el valor y size
-template<typename T>
-void List<T>::searchIndex(T data_)
-{
-    Node<T> *temp = m_head;
-    int cont = 1;
-    int cont2 = 0;
-
-    while (temp) {
-        if (temp->llave == data_) {
-            cout << "El dato se encuentra en la posición: " << cont << endl;
-            cout << "El dato guardado es: " << temp->valor << endl;
-            cout << "El size del dato es : " << temp->size << endl;
-            
-            
-            cont2++;
-        }
-        temp = temp->next;
-        cont++;
-    }
-
-    if (cont2 == 0) {
-        cout << "No existe el dato " << endl;
-    }
-    cout << endl << endl;
-}
-*/
-
-
-//(lib) Buscar todas las llaves iguales a la del parametro y retorna sus indices
+//(serv) Buscar todas las llaves iguales a la del parametro y retorna sus indices
 template<typename T>
 string List<T>::searchIndexes(T data_)
 {
-   /* Node<T> *temp = m_head;
+    Node<T> *temp = m_head;
     int cont = 1;
     int cont2 = 0;
 
@@ -403,46 +437,13 @@ string List<T>::searchIndexes(T data_)
     }else{
         return posiciones;
     }
-    cout << endl << endl;*/
-}
-
-
-
-
-//(lib) Buscar todas las llaves iguales a la del parametro y retorna sus datos(llaves del server)
-template<typename T>
-string List<T>::searchallKeys(T data_)
-{
-    Node<T> *temp = m_head;
-    int cont = 1;
-    int cont2 = 0;
-
-    string Datos="";
-
-    while (temp) {
-        if (temp->llave == data_) {//si la llave guardada es igual a la que le llega
-            //cout << "El dato se encuentra en la posición: " << cont << endl;
-            Datos+=temp->valor;
-            Datos+="#";
-            cont2++;
-        }
-        temp = temp->next;
-        cont++;
-    }
-
-    if (cont2 == 0) {
-        cout << "No existe el dato " << endl;
-        return "no existe el dato";
-    }else{
-        return Datos;
-    }
     cout << endl << endl;
 }
 
 
 
 
-// Buscar el dato de un nodo por llave y retorna el valor 
+// Buscar el dato de un nodo por llave y retorna el valor y size
 template<typename T>
 string List<T>::searchData(T data_)
 {
@@ -452,8 +453,10 @@ string List<T>::searchData(T data_)
 
     while (temp) {
         if (temp->llave == data_) {
-
-            return temp->valor;  // retorna solo el valor que va a ser la llave que busca el dato en el server
+            //cout << "El dato se encuentra en la posición: " << cont << endl;
+            //cout << "El dato guardado es: " << temp->valor << endl;
+            //cout << "El size del dato es : " << temp->size << endl;
+            return temp->valor;//+"#"+temp->size;
             
             cont2++;
         }
@@ -463,9 +466,9 @@ string List<T>::searchData(T data_)
 
     if (cont2 == 0) {
         cout << "No existe el dato con la llave: "<<data_ << endl;
-        return "0";
+        return "false";
     }
-    return "0";
+    return "false";
 }
 
 
@@ -516,3 +519,5 @@ void List<T>::save_file(string file)
 
 template<typename T>
 List<T>::~List() {}
+
+#endif // 
