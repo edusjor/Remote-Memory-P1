@@ -1,6 +1,6 @@
 //
 // Created by edulubu on 28/08/17.
-//ServidorPasivo
+//Servidor Activo
 
 #include "Server.h"
 #include "ListaGenerica.h"
@@ -22,6 +22,7 @@
 
 List<string> list_1; //lista global
 int usoDeMemoria=0;
+
 Server::Server() {
 
     int yes = 1;
@@ -94,16 +95,6 @@ void* Server::playSocket(void* socket_desc){
     int read_size;
     char *message , client_message[1024];
 
-    message = "Aceptado";
-    write(sock , message , strlen(message));
-
-
-
-
-
-
-
-
 
     //Receive a message from client
     while( (read_size = recv(sock , client_message , 1024 , 0)) > 0 )
@@ -142,11 +133,32 @@ void* Server::playSocket(void* socket_desc){
 
 
 
-
+        string operacion0="pruebaConexion";
         string operacion1="guardarValor";
         string operacion2="getValor";
         string operacion3="getMemoryUsage";
         string operacion4="getAllMemoryValues";
+
+
+
+
+
+
+        ////////////////////////////////////////
+        //pruebaConexion
+        //hace la prueba de conexion
+        if(operacion==operacion0){ 
+
+            cout << "pruebaConexion pass."<<endl;
+            string respuesta="pruebaConexionSuccess";
+           
+            char *chrResp = &respuesta[0u];                //convierte la llave de string a char
+            write(sock , chrResp , 1024);  //envia la llave creada al cliente
+            cout<<"Enviado: "<<endl;
+        }
+
+
+
 
 
 

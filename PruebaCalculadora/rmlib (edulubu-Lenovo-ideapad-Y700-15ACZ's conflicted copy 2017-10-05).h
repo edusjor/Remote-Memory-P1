@@ -289,8 +289,16 @@ string rmlib::enviarDato(char* dato){
 }
 string rmlib::socketActuar(char* dato){
 
-        send(client,"pruebaConexion#null#null#null",1024,0);
 
+        cout<<"respuesta 1: "<<send(client, "pruebaConexion#null#null#null",1024, 0)<<endl;
+       
+        cout<<"respuesta 2: "<<recv(client, buffer, bufsize, 0)<<endl;
+        memset(buffer, 0, 1024);
+
+        cout<<"respuesta buffer: "<<buffer<<endl;
+        cout<<"respuesta 1: "<<send(client, "pruebaConexion#null#null#null",1024, 0)<<endl;
+       
+        //Respuesta del server(verificacion de  conexion)
         n=recv(client, buffer, bufsize, 0);
         if (n<=0){
             cout << "servidor no conectado"<<endl<<endl<<endl<<endl<<endl;
@@ -298,11 +306,10 @@ string rmlib::socketActuar(char* dato){
             cout << "respuesta n: "<<n<<endl;
             return "0";
         }
-        cout<<"estado de la conexion: "<<buffer<<endl;
-       
-        
-
         memset(buffer, 0, 1024);
+
+
+        //memset(buffer, 0, 1024);
 
         write(client , dato , strlen(dato));
         recv(client, buffer, bufsize, 0);

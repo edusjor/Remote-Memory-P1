@@ -32,23 +32,21 @@ int Calculadora::guiOperacion(string operacion){
         string valor=to_string(num1+num2);
         string size=to_string(sizeof(valor));
 
-
         string parametros = oper+"#"+llave+"#"+valor+"#"+size;
         char *chrParametros = &parametros[0u]; //convierte string a char
 
         string llaveDelServer=rmlib1->enviarDato(chrParametros);
 
-        if (llaveDelServer=="0"){
+        /*if (llaveDelServer=="0"){
             cout<<"error, servidores desconectados"<<endl;
-            //reconectar
         }
         else{cout<<"por aqui pasa 2"<<endl;
             rmlib1->savellaveEnListaLocal("sumas",llaveDelServer); //guarda la llave del server con una llave local
             cout<<"por aqui pasa 3"<<endl;
-        }
+        }*/
 
         //rmlib1->savellaveEnListaLocal("sumas",llaveDelServer);
-        cout<<"\nllave sumas: "<<rmlib1->getAllLlavesDelServerEnLocal("sumas")<<endl<<endl;
+        //cout<<"\nllave sumas: "<<rmlib1->getAllLlavesDelServerEnLocal("sumas")<<endl<<endl;
         
         
 
