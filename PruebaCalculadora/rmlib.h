@@ -38,7 +38,7 @@
 #include <vector>
 
 
-
+#include "TCPClient.h"
 
 
 
@@ -144,10 +144,9 @@ class rmRef_H{
 class rmlib{
 public:
 
-    int socketClient();
+    int socketClient(int,string);
     void rm_init(char* ip, int port, char* ipHA, int portHA);
     string enviarDato(char* dato);
-    //string getDato(char* llave);
 
     string savellaveEnListaLocal(string llaveLocal,string llaveDelServer);
     string getLlaveDelServerEnLocal(string llaveLocal);
@@ -173,6 +172,8 @@ private:
     int bufsize = 1024;
     char buffer[1024];
 
+    TCPClient tcp;
+
 
     string socketActuar(char*  dato);
 };
@@ -188,69 +189,71 @@ void rmlib::rm_init(char* ip, int port, char* ipHA, int portHA){
     this->isActivo=true;
 
     //inicia Socket
-    socketClient();
+    socketClient(portActivo,ipActivo);
 
 }
 
 /*void rmlib::rm_new (char* key, void* value, int value_size){
-
 }
-
 rmRef_H rmlib::rm_get(char* key){
-
 }
-
 void rmlib::rm_delete(rmRef_H* handler){
+}*/
 
+
+int rmlib::socketClient(int puerto,string ip) {
+
+   
+
+
+        /*
+        tcp.setup(ip,puerto);
+
+
+            string msg = "dato";
+            tcp.Send(msg);
+            string rec = tcp.receive();
+
+            if( rec != "" )
+            {
+                cout << "Server Response:" << rec << endl;
+            }else{
+                cout<<"respi"<<endl;
+            }
+            //sleep(1);
+        
+    
 }
 */
-
-
-int rmlib::socketClient() {
-
-    int portNum=this->portAvailable;
     struct sockaddr_in server_addr;
 
     client = socket(AF_INET, SOCK_STREAM, 0);
 
-    /* ---------- ESTABLISHING SOCKET CONNECTION ----------*/
-    /* --------------- socket() function ------------------*/
+    // ---------- ESTABLISHING SOCKET CONNECTION ----------//
+    // --------------- socket() function ------------------//
 
     if (client < 0) {
         cout << "\nError establishing socket..." << endl;
         exit(1);
     }
-
     cout << "\n=> Socket client has been created..." << endl;
 
     server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(portNum);
+    server_addr.sin_port = htons(puerto);
 
-    /* ---------- CONNECTING THE SOCKET ---------- */
-    /* ---------------- connect() ---------------- */
+    // ---------- CONNECTING THE SOCKET ---------- //
+    // ---------------- connect() ---------------- //
 
-    if (connect(client, (struct sockaddr *) &server_addr, sizeof(server_addr)) == 0){
-        cout << "=> Connection to the server port number: " << portNum << endl;
-    }else{
-        if (isActivo==true){
-            cout <<"servidor activo no conectado, conectando al pasivo"<<endl;
-            this->isActivo=false;
-            portAvailable=portPasivo;
-            socketClient();
-        }else{
-            cout <<"ningun servidor conectado, el programa no puede ejecutarse"<<endl;
-            exit(1);
-        }
-    }
+    connect(client, (struct sockaddr *) &server_addr, sizeof(server_addr));
 
-
-    //cout << "=> Awaiting confirmation from the server..." << endl; //line 40
-    //recv(client, buffer, bufsize, 0);
-    
-    
+    return 0;
 
 
 }
+
+
+
+
 
 string rmlib::enviarDato(char* dato){
     
@@ -267,8 +270,7 @@ string rmlib::enviarDato(char* dato){
         
             
         cout<<"Intentando conectar al servidor Pasivo..."<<endl;
-        portAvailable=portPasivo; //cambia el puerto disponible (pasivo a activo)            
-        socketClient();
+        socketClient(portPasivo,ipPasivo);
             
         cout<<"Comunicando con el servidor Pasivo"<<endl;
         string llaveDelServer = socketActuar(dato);
@@ -288,9 +290,10 @@ string rmlib::enviarDato(char* dato){
 
 }
 string rmlib::socketActuar(char* dato){
+        cout<<endl<<endl<<endl<<"cliente conectandose "<<client<<endl;
 
         send(client,"pruebaConexion#null#null#null",1024,0);
-
+        cout<<"cliente conectandose "<<client<<endl;
         n=recv(client, buffer, bufsize, 0);
         if (n<=0){
             cout << "servidor no conectado"<<endl<<endl<<endl<<endl<<endl;
@@ -394,7 +397,6 @@ string rmlib::getAnythingFromServer(string request){
 }
 /*
 string rmlib::buscarIndicesDeLlave(string llaveLocal){
-
 }*/
 
 

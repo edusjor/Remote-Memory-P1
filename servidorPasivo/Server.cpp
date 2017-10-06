@@ -72,6 +72,7 @@ void Server::aceptarEimprimir() {
 
         //espera aqui hasta que algun cliente se conecte entonces lo acepta y lo asigna al espacio reservado
         c->sock = accept(client, (struct sockaddr *) &server_addr, &size); 
+        cout<<"escuchado cliente: "<<client<<endl;
 
         // first check if it is valid or not
         if (c->sock < 0) {

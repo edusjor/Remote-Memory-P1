@@ -25,7 +25,6 @@ using namespace std;
 class Calculadora {
 
 public:
-    //Calculadora(int argc, int,int);
     Calculadora();
 
 private:

@@ -183,10 +183,10 @@ int Calculadora::interfaz(){
 Calculadora::Calculadora()  {
     //iniciar socket
     char* ipAct = "127.0.0.1";
-    char* ipPas = "127.0.0.2";
+    char* ipPas = "127.0.0.1";
 
     int portAct=8888;
-    int portPas=1500;
+    int portPas=8889;
 
     rmlib1 = new rmlib();
     

@@ -28,7 +28,7 @@ private:
     static vector<Client> clients;
 
     int client, servere;
-    int portNum = 8888;
+    int portNum = 8889;
     bool isExit = false;
     int bufsize = 1024;
     char buffer[1024];
