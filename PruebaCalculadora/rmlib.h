@@ -205,26 +205,6 @@ int rmlib::socketClient(int puerto,string ip) {
 
    
 
-
-        /*
-        tcp.setup(ip,puerto);
-
-
-            string msg = "dato";
-            tcp.Send(msg);
-            string rec = tcp.receive();
-
-            if( rec != "" )
-            {
-                cout << "Server Response:" << rec << endl;
-            }else{
-                cout<<"respi"<<endl;
-            }
-            //sleep(1);
-        
-    
-}
-*/
     struct sockaddr_in server_addr;
 
     client = socket(AF_INET, SOCK_STREAM, 0);
@@ -244,9 +224,26 @@ int rmlib::socketClient(int puerto,string ip) {
     // ---------- CONNECTING THE SOCKET ---------- //
     // ---------------- connect() ---------------- //
 
-    connect(client, (struct sockaddr *) &server_addr, sizeof(server_addr));
+    if (connect(client, (struct sockaddr *) &server_addr, sizeof(server_addr))<0){ //si no se conecta
+        if (isActivo == true){
+            isActivo=false;
+            socketClient(portPasivo,ipPasivo);
+        }if (isActivo==false){
+
+            cout<<"ningun server activo"<<endl;
+        }
+
+    }else{
+        if (isActivo==true){ //si isactivo entonces se conecto al activo
+            //se conecto al activo
+        }else{
+            //se conecto al pasivo
+        }
+
+    }
 
     return 0;
+
 
 
 }
@@ -254,12 +251,20 @@ int rmlib::socketClient(int puerto,string ip) {
 
 
 
-
 string rmlib::enviarDato(char* dato){
     
 
+    //verificar activo
+
+
+
     cout<<"Enviando dato al servidor Activo"<<endl;
 
+
+    if (isActivo==false){
+        socketClient(portActivo,ipActivo);
+
+    }
     string llaveDelServer = socketActuar(dato);
 
     if (llaveDelServer!="0"){
