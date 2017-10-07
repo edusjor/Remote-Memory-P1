@@ -189,7 +189,15 @@ void rmlib::rm_init(char* ip, int port, char* ipHA, int portHA){
     this->isActivo=true;
 
     //inicia Socket
-    socketClient(portActivo,ipActivo);
+    cout<<"Conectando al servidor Activo"<<endl;
+    if (socketClient(portActivo,ipActivo)==0){
+        cout<<"Servidor activo desconectado"<<endl;
+        cout<<"Conectando al servidor Pasivo"<<endl;
+        if (socketClient(portPasivo,ipPasivo)==0){
+        cout<<"Error, ningun servidor disponible"<<endl;
+        exit(1);
+    }
+    }
 
 }
 
@@ -224,25 +232,31 @@ int rmlib::socketClient(int puerto,string ip) {
     // ---------- CONNECTING THE SOCKET ---------- //
     // ---------------- connect() ---------------- //
 
-    if (connect(client, (struct sockaddr *) &server_addr, sizeof(server_addr))<0){ //si no se conecta
-        if (isActivo == true){
-            isActivo=false;
-            socketClient(portPasivo,ipPasivo);
-        }if (isActivo==false){
-
-            cout<<"ningun server activo"<<endl;
-        }
-
-    }else{
-        if (isActivo==true){ //si isactivo entonces se conecto al activo
-            //se conecto al activo
+    /*if (connect(client, (struct sockaddr *) &server_addr, sizeof(server_addr))<0){ //si no se conecta
+            if (isActivo == true){
+                isActivo=false;
+                socketClient(portPasivo,ipPasivo);
+            }if (isActivo==false){
+    
+                cout<<"ningun server activo"<<endl;
+            }
+    
         }else{
-            //se conecto al pasivo
-        }
+            if (isActivo==true){ //si isActivo entonces se conecto al activo
+                //se conecto al activo
+            }else{
+                //se conecto al pasivo
+            }
+    
+        }*/
 
+
+    if (connect(client, (struct sockaddr *) &server_addr, sizeof(server_addr))<0){ //si no se conecta
+        return 0;
     }
-
-    return 0;
+    else{
+        return 1;
+    }
 
 
 
@@ -260,19 +274,20 @@ string rmlib::enviarDato(char* dato){
 
     cout<<"Enviando dato al servidor Activo"<<endl;
 
-
-    if (isActivo==false){
-        socketClient(portActivo,ipActivo);
-
+    if(socketClient(portActivo,ipActivo)==0){ //si el activo no esta disponible se  conecta al pasivo
+        if (socketClient(portPasivo,ipPasivo)==0){
+            cout<<"Ningun servidor esta disponible"<<endl;        }
     }
+
     string llaveDelServer = socketActuar(dato);
 
     if (llaveDelServer!="0"){
-        cout<<"Exito!, libreria y servidor Activo han intercambiado datos exitosamente"<<endl<<endl<<endl;
+        cout<<"Exito!, libreria y servidor han intercambiado datos exitosamente"<<endl<<endl<<endl;
         return llaveDelServer;
 
     }else{
-        
+        cout<<"Hubo un error no se puede hacer la conexion"<<endl;
+        /*
         if (isActivo==true){
             isActivo=false;
             cout<<"Intentando conectar al servidor Pasivo..."<<endl;
@@ -293,7 +308,7 @@ string rmlib::enviarDato(char* dato){
         else{
             cout<<"Ningun servidor esta activo"<<endl;
             return "0";
-            }                
+            }    */            
     }
         
         
