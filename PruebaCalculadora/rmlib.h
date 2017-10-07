@@ -268,9 +268,16 @@ string rmlib::enviarDato(char* dato){
 
     }else{
         
-            
-        cout<<"Intentando conectar al servidor Pasivo..."<<endl;
-        socketClient(portPasivo,ipPasivo);
+        if (isActivo==true){
+            isActivo=false;
+            cout<<"Intentando conectar al servidor Pasivo..."<<endl;
+            socketClient(portPasivo,ipPasivo);
+        }else{
+            isActivo=true;
+            cout<<"Intentando conectar al servidor Activo..."<<endl;
+            socketClient(portActivo,ipActivo);
+        }
+        
             
         cout<<"Comunicando con el servidor Pasivo"<<endl;
         string llaveDelServer = socketActuar(dato);
@@ -281,9 +288,7 @@ string rmlib::enviarDato(char* dato){
         else{
             cout<<"Ningun servidor esta activo"<<endl;
             return "0";
-            }
-
-                
+            }                
     }
         
         
@@ -297,11 +302,9 @@ string rmlib::socketActuar(char* dato){
         n=recv(client, buffer, bufsize, 0);
         if (n<=0){
             cout << "servidor no conectado"<<endl<<endl<<endl<<endl<<endl;
-            cout << "respuesta buffer: "<<buffer<<endl;
-            cout << "respuesta n: "<<n<<endl;
             return "0";
         }
-        cout<<"estado de la conexion: "<<buffer<<endl;
+        cout<<"estado de la conexion con server "<<client<<": "<<buffer<<endl;
        
         
 
