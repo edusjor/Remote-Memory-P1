@@ -25,6 +25,9 @@ int usoDeMemoria=0;
 
 Server::Server() {
 
+
+    
+
     int yes = 1;
 
     /* ---------- ESTABLISHING SOCKET CONNECTION ----------*/
@@ -179,6 +182,14 @@ void* Server::playSocket(void* socket_desc){
             char *chrLlave = &llave[0u];                //convierte la llave de string a char
             write(sock , chrLlave , strlen(chrLlave));  //envia la llave creada al cliente
             usoDeMemoria+=(sizeof(valor))/4;            //Le suma a una variable de control de memoria el tamano del valor guardado
+        
+            string dato = llave+"@"+valor+"#";
+
+            Sincronizacion sinc;
+            
+            sinc.sincronizar();
+            cout<<"sincronizar"<<endl;
+
         }
 
 
@@ -267,6 +278,7 @@ void* Server::playSocket(void* socket_desc){
             keyToClear+=clientKeysControl[i];
         }        
     }*/
+}
 
 
 
@@ -275,8 +287,99 @@ void* Server::playSocket(void* socket_desc){
 
 
 
+
+
+
+
+
+
+
+
+//sincronizar a pasivo
+void Sincronizacion::sincronizar(){
+    cout<<"pasivo conectado 0"<<endl;
+    if(socketClient(puertoPasSINC)==1){//crea la conexion
+        cout<<"pasivo conectado 1"<<endl;
+        if (verifServPas() ==1){//verifica la conexion, si pasivo esta activo
+            cout<<"pasivo conectado 2 "<<endl;
+            if (flagPasivoisON==false){
+                flagPasivoisON=true;
+                enviarTodo(); //enviar todo
+            }else{
+                //enviarDato(dato);//enviar dato solamente
+
+            }
+        }else{
+            flagPasivoisON=false;
+            cout<<"pasivo NO conectado"<<endl;
+        }
+    }else{
+        cout<<"pasivo conectado3"<<endl;
+            flagPasivoisON=false;
+        }//si no el servidor pasivo esta desconectado
+}
+
+
+int Sincronizacion::verifServPas(){
+    send(client_SINC,"pruebaConexion",1024,0);
+    n=recv(client_SINC, buffer_SINC, bufsize, 0);
+    memset(buffer_SINC, 0, 1024);
+    if (n<=0){
+        //cout << "servidor pasivo no conectado"<<endl<<endl<<endl<<endl<<endl;
+        return 0;
+    }
+    return 1;
+}
+
+string Sincronizacion::enviarDato(string dato){
+    char* chrDato = &dato[0u];
+    write(client_SINC , chrDato , strlen(chrDato));
+}
+
+string Sincronizacion::enviarTodo(){
+    string datosTodos = list_1.iterarTodo();//trae todos los datos de la lista
+    enviarDato(datosTodos);
+}
+
+
+//Cliente socket del servidor
+int Sincronizacion::socketClient(int puertoPasSINC) {
+
+    struct sockaddr_in server_addr;
+
+    client_SINC = socket(AF_INET, SOCK_STREAM, 0);
+
+    // ---------- ESTABLISHING SOCKET CONNECTION ----------//
+    // --------------- socket() function ------------------//
+
+    if (client_SINC < 0) {
+        cout << "\nError establishing socket..." << endl;
+        exit(1);
+    }
+    cout << "\n=> Socket client has been created..." << endl;
+
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(puertoPasSINC);
+
+
+
+    if (connect(client_SINC, (struct sockaddr *) &server_addr, sizeof(server_addr))<0){ //si no se conecta
+        return 0;
+    }
+    else{
+        return 1;
+    }
 
 }
+
+
+
+
+
+
+
+
+
 
 
 

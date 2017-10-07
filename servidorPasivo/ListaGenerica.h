@@ -99,6 +99,7 @@ class List
         //string searchallData(T);
         string searchData(T); //busca un dato por llave para retornarlo junto con su tamano
         void sort();
+        string iterarTodo();
 
 
     private:
@@ -443,6 +444,7 @@ string List<T>::searchIndexes(T data_)
 
 
 
+
 // Buscar el dato de un nodo por llave y retorna el valor y size
 template<typename T>
 string List<T>::searchData(T data_)
@@ -470,6 +472,34 @@ string List<T>::searchData(T data_)
     }
     return "false";
 }
+
+
+//Busca y retorna todos los datos con sus llaves en formato
+//string     llave@dato#llave@dato#llave@dato#
+template<typename T>
+string List<T>::iterarTodo()
+{
+    Node<T> *temp = m_head;
+    int cont = 1;
+    int cont2 = 0;
+
+    //separadorNodo #
+    //separa dato @
+    string datos="";
+
+    while (temp) {
+        
+            datos=datos+temp->llave+"#"+temp->valor+"@";
+            
+            cont2++;
+        
+        temp = temp->next;
+       
+    }
+    return datos; //retorna todos los datos en un string
+}
+
+
 
 
 // Ordenar de manera ascendente

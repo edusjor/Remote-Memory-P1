@@ -23,8 +23,12 @@
 List<string> list_1; //lista global
 int usoDeMemoria=0;
 
+
 Server::Server() {
 
+    //pthread_t thread_id_SINCserver;
+    //pthread_create( &thread_id_SINCserver , NULL ,  iniciarSincro ,  NULL);         
+    
     int yes = 1;
 
     /* ---------- ESTABLISHING SOCKET CONNECTION ----------*/
@@ -62,7 +66,6 @@ Server::Server() {
     listen(client, 5);
 }
 
-
 Client *c;
 void Server::aceptarEimprimir() {
 
@@ -92,22 +95,27 @@ void* Server::playSocket(void* socket_desc){
     string clientKeysControl=""; //string que lleva el conteo de llaves creadas por este cliente.
     string separador="#";
 
+    
     int sock = *(int*)socket_desc;
     int read_size;
     char *message , client_message[1024];
 
 
+
+
+    string val="";
     //Receive a message from client
     while( (read_size = recv(sock , client_message , 1024 , 0)) > 0 )
     {
         //end of string marker
         client_message[read_size] = '\0';
-        cout <<endl<<endl<< "Mensaje recibido del cliente: "<<client_message<<endl;
+        cout <<endl<<endl<< "Mensaje recibido del cliente: "<<client_message<<endl;   
+        string operacion="",llave="",valor="",size="" ;
+        
 
         //itera el string del char recibido en el mensaje 
         //para separar la llave, el valor y el tamano
         string strclient_message = string(client_message); //convierte el mensaje del cliente a string
-        string operacion="",llave="",valor="",size="" ;
         
         int cont=0;
         for(int i=0; i < strclient_message.length(); i++){
@@ -129,6 +137,7 @@ void* Server::playSocket(void* socket_desc){
                     size=size+strclient_message[i];
             }        
         }
+        val=valor;
 
 
 
@@ -139,14 +148,16 @@ void* Server::playSocket(void* socket_desc){
         string operacion2="getValor";
         string operacion3="getMemoryUsage";
         string operacion4="getAllMemoryValues";
+        string operacion5="pruebaConexionDesdeActivo";
+        string operacion6="sincActivoToPasivo";
 
 
 
 
 
-
+        
         ////////////////////////////////////////
-        //pruebaConexion
+        //pruebaConexion desde libreria
         //hace la prueba de conexion
         if(operacion==operacion0){ 
 
@@ -175,10 +186,12 @@ void* Server::playSocket(void* socket_desc){
             clientKeysControl+=(llave+separador);         //concatena a la variable de control de llaves de este usuario la nueva llave creada
 
             list_1.add_head(llave,valor,size);          //guarda en la lista la llave, el valor y tamano del dato
-
+            cout<<"llave en server: "<<llave<<endl;
             char *chrLlave = &llave[0u];                //convierte la llave de string a char
             write(sock , chrLlave , strlen(chrLlave));  //envia la llave creada al cliente
             usoDeMemoria+=(sizeof(valor))/4;            //Le suma a una variable de control de memoria el tamano del valor guardado
+
+            cout<<"llave en server: "<<chrLlave<<endl;
         }
 
 
@@ -216,7 +229,75 @@ void* Server::playSocket(void* socket_desc){
 
 
 
+       
+
+
+
+
         ////////////////////////////////////////
+        //pruebaConexionDesdeActivo
+        //hace la prueba de conexion
+        if(operacion==operacion5){
+
+            string respuesta="pruebaConexionDesdeActivoSuccess";
+            char *chrResp = &respuesta[0u];                //convierte la llave de string a char
+            write(sock , chrResp , 1024);  //envia la respuesta 
+
+        }
+
+
+
+
+
+
+
+        ////////////////////////////////////////
+        //sincActivoToPasivo
+        //sincroniza los datos recibidos del activo al pasivo
+        if(operacion==operacion6){
+
+            string separador1="@";
+            string separador2="&";
+
+    
+            //itera el string del valor recibido en el mensaje 
+            string llav="";
+            string val="";
+            string siz=""; //esta var la hace con sizeof en local
+
+            int cont=0;
+            for(int i=0; i < valor.length(); i++){
+                
+                if ((valor[i])==separador1[0]){
+                    cont=1;
+                }
+                if ((valor[i])==separador2[0]){
+                    cont=2;
+                }
+
+
+                if(cont==0)
+                    llav=llav+valor[i];
+
+                if(cont==1)
+                    val=val+valor[i];
+
+                if(cont==2){ 
+                    //guardar en lista
+                    usoDeMemoria+=sizeof(valor);
+                    size=to_string(sizeof(valor));
+                    list_1.add_head(llav,val,siz);          //guarda en la lista la llave, el valor y tamano del dato
+
+                    cont=0;
+                    llave="";
+                    valor="";
+                    size="";
+                }
+            }
+        }
+
+
+         ////////////////////////////////////////
         //getMemoryUsage
         //envia al cliente el uso de memoria actual, en bytes
         if (operacion==operacion3){ 
@@ -226,6 +307,12 @@ void* Server::playSocket(void* socket_desc){
                 write(sock , chrDato , strlen(chrDato));                        //envia el dato de control de memoria al cliente
             }
         }
+
+        cout<<"passss"<<endl;
+
+
+
+
         //clear the message buffer
         memset(client_message, 0, 1024);
         
@@ -240,45 +327,110 @@ void* Server::playSocket(void* socket_desc){
         perror("recv failed");
     }
 
-
-
-
-
-
-
-
-
-
-
-    ///////////////////////////////////////////////
-    //Borra los datos guardados por el cliente
-    //si llega aqui ya se desconecto
-    /*string keyToClear="";
-    cout<<clientKeysControl<<endl;
-    for(int i=0; i < clientKeysControl.length(); i++){
-            
-        if ((clientKeysControl[i])==separador[0]){
-            list_1.del_by_data(keyToClear);         //elimina el nodo asociado a esa llave
-            usoDeMemoria-=4;                        //libera 4 bytes de la variable de control de uso de memoria
-            cout<<"llave: "<<keyToClear<<" vaciada"<<endl;
-            keyToClear="";                          //limpia la variable de la llave a eliminar porque ya se elimino en la linea anterior
-        }
-        else{
-            keyToClear+=clientKeysControl[i];
-        }        
-    }*/
-
-
-
-
-
-
-
-
-
 }
 
 
 
 
-////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//sincronizar a activo
+//arreglar  
+void Sincronizacion::sincronizar(){
+    cout<<"pasivo conectado 0"<<endl;
+    if(socketClientSINC(puertoPasSINC)==1){//crea la conexion
+        cout<<"pasivo conectado 1"<<endl;
+        if (verifServAct() ==1){//verifica la conexion, si pasivo esta activo
+            cout<<"pasivo conectado 2 "<<endl;
+            if (flagPasivoisON==false){
+                flagPasivoisON=true;
+                enviarTodo(); //enviar todo
+            }else{
+                //enviarDato(dato);//enviar dato solamente
+
+            }
+        }else{
+            flagPasivoisON=false;
+            cout<<"pasivo NO conectado"<<endl;
+        }
+    }else{
+        cout<<"pasivo conectado3"<<endl;
+            flagPasivoisON=false;
+        }//si no el servidor pasivo esta desconectado
+}
+
+
+int Sincronizacion::verifServAct(){
+    send(client_SINC,"pruebaConexion",1024,0);
+    n=recv(client_SINC, buffer_SINC, bufsize, 0);
+    memset(buffer_SINC, 0, 1024);
+    if (n<=0){
+        //cout << "servidor pasivo no conectado"<<endl<<endl<<endl<<endl<<endl;
+        return 0;
+    }
+    return 1;
+}
+
+string Sincronizacion::enviarDato(string dato){
+    char* chrDato = &dato[0u];
+    write(client_SINC , chrDato , strlen(chrDato));
+}
+
+string Sincronizacion::enviarTodo(){
+    string datosTodos = list_1.iterarTodo();//trae todos los datos de la lista
+    enviarDato(datosTodos);
+}
+
+
+//Cliente socket del servidor
+int Sincronizacion::socketClientSINC(int puertoPasSINC) {
+
+    struct sockaddr_in server_addr;
+
+    client_SINC = socket(AF_INET, SOCK_STREAM, 0);
+
+    // ---------- ESTABLISHING SOCKET CONNECTION ----------//
+    // --------------- socket() function ------------------//
+
+    if (client_SINC < 0) {
+        cout << "\nError establishing socket..." << endl;
+        exit(1);
+    }
+    cout << "\n=> Socket client has been created..." << endl;
+
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(puertoPasSINC);
+
+
+
+    if (connect(client_SINC, (struct sockaddr *) &server_addr, sizeof(server_addr))<0){ //si no se conecta
+        return 0;
+    }
+    else{
+        return 1;
+    }
+
+}

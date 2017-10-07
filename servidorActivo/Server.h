@@ -23,7 +23,6 @@
 using namespace std;
 
 class Server {
-
 private:
     static vector<Client> clients;
 
@@ -43,7 +42,35 @@ private:
 public:
     Server();
     void aceptarEimprimir();
+
+    int socketClient(int puerto); 
+    static void sincronizar();
+    int verifServPas();
+    string enviarDato(string dato);
+    string enviarTodo();
+
 };
+
+
+
+class Sincronizacion{
+public:
+    //Sincronizacion();
+    void sincronizar();
+private:
+    int verifServPas();
+    string enviarDato(string dato);
+    string enviarTodo();
+    int socketClient(int);
+
+    int puertoPasSINC=7777;   //este es el puerto del serverSINC en pasivo
+    int client_SINC;
+    char buffer_SINC[1024];
+    int bufsize = 1024;
+    int n;
+    int flagPasivoisON=false;
+};
+
 
 
 #endif //SERVIDORACTIVO_SERVER_H
