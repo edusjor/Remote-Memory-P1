@@ -68,26 +68,34 @@ Server::Server() {
 
 Client *c;
 void Server::aceptarEimprimir() {
-
     while (1) {
         
         c = new Client(); //reserva un nuevo "espacio" para el siguiente cliente que se conecte
 
         //espera aqui hasta que algun cliente se conecte entonces lo acepta y lo asigna al espacio reservado
         c->sock = accept(client, (struct sockaddr *) &server_addr, &size); 
-        cout<<"escuchado cliente: "<<client<<endl;
+        cout<<"Cliente escuchado: "<<client<<endl;
 
         // first check if it is valid or not
         if (c->sock < 0) {
             cout << "=> Error on accepting..." << endl;
         } 
         else {
+
             //crea el nuevo thread que manejara al nuevo cliente y sigue en el loop esperando nuevos clientes
             pthread_t thread_id;
             pthread_create( &thread_id , NULL ,  playSocket , (void*) &c->sock );         
         }
     }
 }
+
+
+
+
+
+
+
+
 
 //Entra aqui por cada nueva conexion con un cliente
 //Aqui se maneja todas las peticiones del cliente
@@ -101,9 +109,7 @@ void* Server::playSocket(void* socket_desc){
     char *message , client_message[1024];
 
 
-
-
-    string val="";
+    string val=""; //agrega aqui llave&valor@llave2&valor2@.... 
     //Receive a message from client
     while( (read_size = recv(sock , client_message , 1024 , 0)) > 0 )
     {
@@ -117,9 +123,14 @@ void* Server::playSocket(void* socket_desc){
         //para separar la llave, el valor y el tamano
         string strclient_message = string(client_message); //convierte el mensaje del cliente a string
         
+
+
+
+
+
+
         int cont=0;
         for(int i=0; i < strclient_message.length(); i++){
-            
             if ((strclient_message[i])==separador[0]){
                 cont+=1;
             }
@@ -135,9 +146,12 @@ void* Server::playSocket(void* socket_desc){
 
                 if(cont==3)
                     size=size+strclient_message[i];
+
             }        
         }
-        val=valor;
+
+        val=llave;
+
 
 
 
@@ -189,7 +203,10 @@ void* Server::playSocket(void* socket_desc){
             cout<<"llave en server: "<<llave<<endl;
             char *chrLlave = &llave[0u];                //convierte la llave de string a char
             write(sock , chrLlave , strlen(chrLlave));  //envia la llave creada al cliente
-            usoDeMemoria+=(sizeof(valor))/4;            //Le suma a una variable de control de memoria el tamano del valor guardado
+            usoDeMemoria+=(sizeof(valor));            //Le suma a una variable de control de memoria el tamano del valor guardado
+            cout<<"operacion: "<<operacion<<endl;
+            cout<<"valor: "<<val<<endl;
+
 
             cout<<"llave en server: "<<chrLlave<<endl;
         }
@@ -256,25 +273,69 @@ void* Server::playSocket(void* socket_desc){
         //sincroniza los datos recibidos del activo al pasivo
         if(operacion==operacion6){
 
-            string separador1="@";
-            string separador2="&";
+            string separador1="&";
+            string separador2="@";
 
     
             //itera el string del valor recibido en el mensaje 
+            //string llave="";
+            valor=llave;
+
             string llav="";
             string val="";
             string siz=""; //esta var la hace con sizeof en local
 
+            cout<<"valor op 5: "<<valor<<endl;
             int cont=0;
-            for(int i=0; i < valor.length(); i++){
+            cout<<"tamano: "<<valor.length()<<endl;
+            int tamano=valor.length();
+
+            int flag = 0;
+            while (cont<=tamano){
+                if (valor[cont]==separador1[0]){
+                    flag=5;
+                }
+
+                if(valor[cont] == separador2[0]){
+                    flag=2;
+                }
+
+                if (flag==0){
+                    llav+=valor[cont];
+                }
+
+                if(flag==1)
+                    val+=valor[cont];
+                    
+                if (flag ==5){
+                    flag =1;
+                }
+                if (flag == 2){
+
+                    list_1.add_head(llav,val,siz);
+                    flag = 0;
+                    cout <<"val: "<<val<<endl;
+                    llav="";
+                    val="";
+                    size="";
+                }
+                /*if (flag==2)
+                    flag=3;*/
+                cont +=1;
+
                 
+
+            
+
+            /*for(int i=0; i <= tamano; i++){
+                cout<<"valor i: "<<valor[i]<<endl;
                 if ((valor[i])==separador1[0]){
                     cont=1;
                 }
+
                 if ((valor[i])==separador2[0]){
                     cont=2;
                 }
-
 
                 if(cont==0)
                     llav=llav+valor[i];
@@ -284,16 +345,22 @@ void* Server::playSocket(void* socket_desc){
 
                 if(cont==2){ 
                     //guardar en lista
-                    usoDeMemoria+=sizeof(valor);
+                    usoDeMemoria+=sizeof(val);
                     size=to_string(sizeof(valor));
                     list_1.add_head(llav,val,siz);          //guarda en la lista la llave, el valor y tamano del dato
-
                     cont=0;
-                    llave="";
-                    valor="";
-                    size="";
-                }
+                    cout<<"val: "<<val<<endl;
+                    cout<<"i: "<<i<<endl;
+
+                llav="";
+                valor="";
+                size="";
+                }   
+                cout<<"se sale en i= "<<i<<endl;
+                
+                */
             }
+            valor="";
         }
 
 
@@ -302,20 +369,36 @@ void* Server::playSocket(void* socket_desc){
         //envia al cliente el uso de memoria actual, en bytes
         if (operacion==operacion3){ 
 
-                string str_UsoDeMemoria=to_string(usoDeMemoria)+" bytes";       //convierte a string la var de control de memoria
+                string str_UsoDeMemoria=to_string(usoDeMemoria/4)+" bytes";       //convierte a string la var de control de memoria
                 char *chrDato = &str_UsoDeMemoria[0u];                          //convierte de string a char
                 write(sock , chrDato , strlen(chrDato));                        //envia el dato de control de memoria al cliente
             }
+
+
+        ////////////////////////////////////////
+        //getAllMemoryValues
+        //envia al cliente lo que hay en memoria actual
+        if (operacion==operacion4){ 
+
+                string str_Memory_values = list_1.retornarTodo();
+                char *chrDato = &str_Memory_values[0u];                          //convierte de string a char
+                write(sock , chrDato , strlen(chrDato));                        //envia el dato de control de memoria al cliente
         }
+
+
+
+
+
+        
 
         cout<<"passss"<<endl;
 
 
-
-
         //clear the message buffer
-        memset(client_message, 0, 1024);
-        
+        memset(client_message, 0, 1024);   
+    
+    }//termina el while
+    
 
     if(read_size == 0)
     {
@@ -360,11 +443,11 @@ void* Server::playSocket(void* socket_desc){
 //sincronizar a activo
 //arreglar  
 void Sincronizacion::sincronizar(){
-    cout<<"pasivo conectado 0"<<endl;
-    if(socketClientSINC(puertoPasSINC)==1){//crea la conexion
-        cout<<"pasivo conectado 1"<<endl;
+
+    if(socketClientSINC(puertoServAct)==1){//crea la conexion con activo
+
         if (verifServAct() ==1){//verifica la conexion, si pasivo esta activo
-            cout<<"pasivo conectado 2 "<<endl;
+            cout<<"pasivo SI conectado "<<endl;
             if (flagPasivoisON==false){
                 flagPasivoisON=true;
                 enviarTodo(); //enviar todo
@@ -374,10 +457,10 @@ void Sincronizacion::sincronizar(){
             }
         }else{
             flagPasivoisON=false;
-            cout<<"pasivo NO conectado"<<endl;
+            cout<<"pasivo NO conectado 2"<<endl;
         }
     }else{
-        cout<<"pasivo conectado3"<<endl;
+            cout<<"pasivo NO conectado 1"<<endl;
             flagPasivoisON=false;
         }//si no el servidor pasivo esta desconectado
 }

@@ -24,6 +24,7 @@ class Monitor_De_Memoria{
 	private:
 		int interfaz();
 		void memoryUsage();
+		void memoryValues();
 };
 
 

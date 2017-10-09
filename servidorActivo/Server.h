@@ -14,6 +14,7 @@
 #include <cstdlib>
 #include <cstring>
 
+#include <string>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include "Client.h"
@@ -22,12 +23,13 @@
 
 using namespace std;
 
+//server activo
 class Server {
 private:
     static vector<Client> clients;
 
     int client, servere;
-    int portNum = 8888;
+    int portNum = 8888; //puerto de activo 
     bool isExit = false;
     int bufsize = 1024;
     char buffer[1024];
@@ -56,19 +58,19 @@ public:
 class Sincronizacion{
 public:
     //Sincronizacion();
-    void sincronizar();
+    void sincronizar(string);
 private:
     int verifServPas();
-    string enviarDato(string dato);
-    string enviarTodo();
+    void enviarDato(string dato);
+    void enviarTodo();
     int socketClient(int);
 
-    int puertoPasSINC=7777;   //este es el puerto del serverSINC en pasivo
+    int puertoPasivo=8889;   //este es el puerto del serverSINC en pasivo
     int client_SINC;
     char buffer_SINC[1024];
     int bufsize = 1024;
     int n;
-    int flagPasivoisON=false;
+    //int flagPasivoisON=false;
 };
 
 

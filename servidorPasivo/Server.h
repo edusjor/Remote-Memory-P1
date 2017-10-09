@@ -89,7 +89,8 @@ private:
 
     ///////////////////////////
     //para el thread que recibe los datos de sincronizacion del activo
-    int puertoPasSINC_serv=7777;
+    int puertoServAct= 8888; //para conectarse  al activo
+
     int client_serv;
     char buffer_SINC_serv[1024];
     int n_serv;

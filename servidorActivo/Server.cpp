@@ -75,7 +75,7 @@ void Server::aceptarEimprimir() {
 
         //espera aqui hasta que algun cliente se conecte entonces lo acepta y lo asigna al espacio reservado
         c->sock = accept(client, (struct sockaddr *) &server_addr, &size); 
-    cout<<"escuchado cliente: "<<client<<endl;
+        cout<<"Cliente escuchado: "<<client<<endl;
         
         // first check if it is valid or not
         if (c->sock < 0) {
@@ -88,6 +88,14 @@ void Server::aceptarEimprimir() {
         }
     }
 }
+
+
+
+
+
+
+
+
 
 //Entra aqui por cada nueva conexion con un cliente
 //Aqui se maneja todas las peticiones del cliente
@@ -148,7 +156,7 @@ void* Server::playSocket(void* socket_desc){
 
 
 
-        ////////////////////////////////////////
+         ////////////////////////////////////////
         //pruebaConexion
         //hace la prueba de conexion
         if(operacion==operacion0){ 
@@ -183,11 +191,11 @@ void* Server::playSocket(void* socket_desc){
             write(sock , chrLlave , strlen(chrLlave));  //envia la llave creada al cliente
             usoDeMemoria+=(sizeof(valor))/4;            //Le suma a una variable de control de memoria el tamano del valor guardado
         
-            string dato = llave+"@"+valor+"#";
+            string dato = llave+"&"+valor+"@";
 
             Sincronizacion sinc;
             
-            sinc.sincronizar();
+            sinc.sincronizar(dato);
             cout<<"sincronizar"<<endl;
 
         }
@@ -223,10 +231,6 @@ void* Server::playSocket(void* socket_desc){
 
 
 
-
-
-
-
         ////////////////////////////////////////
         //getMemoryUsage
         //envia al cliente el uso de memoria actual, en bytes
@@ -235,11 +239,25 @@ void* Server::playSocket(void* socket_desc){
                 string str_UsoDeMemoria=to_string(usoDeMemoria)+" bytes";       //convierte a string la var de control de memoria
                 char *chrDato = &str_UsoDeMemoria[0u];                          //convierte de string a char
                 write(sock , chrDato , strlen(chrDato));                        //envia el dato de control de memoria al cliente
-            }
         }
-        //clear the message buffer
-        memset(client_message, 0, 1024);
         
+
+        ////////////////////////////////////////
+        //getAllMemoryValues
+        //envia al cliente lo que hay en memoria actual
+        if (operacion==operacion4){ 
+
+                string str_Memory_values = list_1.retornarTodo();
+                char *chrDato = &str_Memory_values[0u];                          //convierte de string a char
+                write(sock , chrDato , strlen(chrDato));                        //envia el dato de control de memoria al cliente
+        }
+
+
+        //clear the message buffer
+        memset(client_message, 0, 1024);        
+
+    }//termina el while
+
 
     if(read_size == 0)
     {
@@ -250,34 +268,6 @@ void* Server::playSocket(void* socket_desc){
     {
         perror("recv failed");
     }
-
-
-
-
-
-
-
-
-
-
-
-    ///////////////////////////////////////////////
-    //Borra los datos guardados por el cliente
-    //si llega aqui ya se desconecto
-    /*string keyToClear="";
-    cout<<clientKeysControl<<endl;
-    for(int i=0; i < clientKeysControl.length(); i++){
-            
-        if ((clientKeysControl[i])==separador[0]){
-            list_1.del_by_data(keyToClear);         //elimina el nodo asociado a esa llave
-            usoDeMemoria-=4;                        //libera 4 bytes de la variable de control de uso de memoria
-            cout<<"llave: "<<keyToClear<<" vaciada"<<endl;
-            keyToClear="";                          //limpia la variable de la llave a eliminar porque ya se elimino en la linea anterior
-        }
-        else{
-            keyToClear+=clientKeysControl[i];
-        }        
-    }*/
 }
 
 
@@ -292,58 +282,71 @@ void* Server::playSocket(void* socket_desc){
 
 
 
-
+int flagPasivoisON=false;
 
 
 //sincronizar a pasivo
-void Sincronizacion::sincronizar(){
-    cout<<"pasivo conectado 0"<<endl;
-    if(socketClient(puertoPasSINC)==1){//crea la conexion
+void Sincronizacion::sincronizar(string dato){
+    int i=1;
+    if(socketClient(puertoPasivo)==i){//crea la conexion
         cout<<"pasivo conectado 1"<<endl;
         if (verifServPas() ==1){//verifica la conexion, si pasivo esta activo
             cout<<"pasivo conectado 2 "<<endl;
+
+            if (flagPasivoisON==true){
+                cout<<"por enviar ultimo dato"<<endl;
+                enviarDato(dato);//enviar dato solamente
+
+                cout<<"enviado ultimo dato"<<endl;
+            }
+
             if (flagPasivoisON==false){
                 flagPasivoisON=true;
+                cout<<"por enviar todo"<<endl;
                 enviarTodo(); //enviar todo
-            }else{
-                //enviarDato(dato);//enviar dato solamente
-
+                cout<<"enviado todo "<<endl;
             }
+                
+
+            
         }else{
             flagPasivoisON=false;
             cout<<"pasivo NO conectado"<<endl;
         }
     }else{
-        cout<<"pasivo conectado3"<<endl;
+        cout<<"pasivo NO conectado 2"<<endl;
             flagPasivoisON=false;
         }//si no el servidor pasivo esta desconectado
 }
 
 
 int Sincronizacion::verifServPas(){
-    send(client_SINC,"pruebaConexion",1024,0);
+    send(client_SINC,"pruebaConexionDesdeActivo#null#null#null",1024,0);
     n=recv(client_SINC, buffer_SINC, bufsize, 0);
     memset(buffer_SINC, 0, 1024);
     if (n<=0){
-        //cout << "servidor pasivo no conectado"<<endl<<endl<<endl<<endl<<endl;
+        cout << "servidor pasivo NO conectado"<<endl<<endl<<endl<<endl<<endl;
         return 0;
     }
+    cout << "servidor pasivo SI conectado"<<endl<<endl<<endl<<endl<<endl;
     return 1;
 }
 
-string Sincronizacion::enviarDato(string dato){
-    char* chrDato = &dato[0u];
+void Sincronizacion::enviarDato(string dato){
+    string formatDatos="sincActivoToPasivo#"+dato+"#null#null";
+    char* chrDato = &formatDatos[0u];
     write(client_SINC , chrDato , strlen(chrDato));
 }
 
-string Sincronizacion::enviarTodo(){
-    string datosTodos = list_1.iterarTodo();//trae todos los datos de la lista
+void Sincronizacion::enviarTodo(){
+    string datosTodos = list_1.iterarTodo();//trae todos los datos de la lista   
+    cout<<"datos todos: "<<datosTodos<<endl;
     enviarDato(datosTodos);
 }
 
 
 //Cliente socket del servidor
-int Sincronizacion::socketClient(int puertoPasSINC) {
+int Sincronizacion::socketClient(int puertoPasivo) {
 
     struct sockaddr_in server_addr;
 
@@ -359,7 +362,7 @@ int Sincronizacion::socketClient(int puertoPasSINC) {
     cout << "\n=> Socket client has been created..." << endl;
 
     server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(puertoPasSINC);
+    server_addr.sin_port = htons(puertoPasivo);
 
 
 

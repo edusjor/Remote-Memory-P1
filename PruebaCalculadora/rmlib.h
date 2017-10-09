@@ -38,7 +38,7 @@
 #include <vector>
 
 
-#include "TCPClient.h"
+//#include "TCPClient.h"
 
 
 
@@ -172,7 +172,7 @@ private:
     int bufsize = 1024;
     char buffer[1024];
 
-    TCPClient tcp;
+    //TCPClient tcp;
 
 
     string socketActuar(char*  dato);
@@ -257,8 +257,6 @@ int rmlib::socketClient(int puerto,string ip) {
     else{
         return 1;
     }
-
-
 
 }
 

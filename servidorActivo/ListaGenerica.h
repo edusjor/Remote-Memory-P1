@@ -99,8 +99,8 @@ class List
         //string searchallData(T);
         string searchData(T); //busca un dato por llave para retornarlo junto con su tamano
         void sort();
-        string iterarTodo();
-
+        string iterarTodo(); //saca todos los datos de la lista         llave1@valor1&llave2@valor2&......
+        string retornarTodo();
 
     private:
         Node<T> *m_head;
@@ -489,7 +489,7 @@ string List<T>::iterarTodo()
 
     while (temp) {
         
-            datos=datos+temp->llave+"#"+temp->valor+"@";
+            datos=datos+temp->llave+"&"+temp->valor+"@";
             
             cont2++;
         
@@ -500,7 +500,31 @@ string List<T>::iterarTodo()
 }
 
 
+//Busca y retorna todos los datos con sus llaves en string acomodado
+//string     llave: valor
+//           llave2: valor2
+template<typename T>
+string List<T>::retornarTodo()
+{
+    Node<T> *temp = m_head;
+    int cont = 1;
+    int cont2 = 0;
 
+    //separadorNodo #
+    //separa dato @
+    string datos="";
+    string formato="-----------------\nLlave       Valor\n";
+    while (temp) {
+        
+            datos=datos+temp->llave+": "+temp->valor+"\n";
+            
+            cont2++;
+        
+        temp = temp->next;
+       
+    }
+    return formato+datos; //retorna todos los datos en un string
+}
 
 // Ordenar de manera ascendente
 template<typename T>

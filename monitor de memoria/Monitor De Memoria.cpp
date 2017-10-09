@@ -19,14 +19,15 @@ Monitor_De_Memoria::Monitor_De_Memoria(){
     
     rmlib1 = new rmlib();
 
-    rmlib1->rm_init(ip,1500,ip,8888);
+    rmlib1->rm_init(ip,8889,ip,8888);
 
     interfaz();
 }
 
 int Monitor_De_Memoria::interfaz(){
     cout << "1-Memory Usage"<<endl;
-    cout << "2-Salir"<<endl;
+    cout << "2-Memory Values"<<endl;
+    cout << "3-Salir"<<endl;
 
 
     int choice;
@@ -38,6 +39,9 @@ int Monitor_De_Memoria::interfaz(){
         	memoryUsage();
             break;
         case 2:
+            memoryValues();
+            break;
+        case 3:
             exit(true);
     }
 
@@ -45,9 +49,15 @@ int Monitor_De_Memoria::interfaz(){
 }
 
 void Monitor_De_Memoria::memoryUsage(){
-	cout<<"lol"<<endl;
-	while (1){ 
-	    string getMemoryUsage = rmlib1->getAnythingFromServer("getMemoryUsage");
-	    cout<<"uso de memoria: "<<getMemoryUsage<<endl;
-	}
+	cout<<"Pidiendo Uso de memoria"<<endl;
+	string getMemoryUsage = rmlib1->getAnythingFromServer("getMemoryUsage");
+    cout<<"uso de memoria: "<<getMemoryUsage<<endl<<endl;
+    interfaz();
+	
+}
+
+void Monitor_De_Memoria::memoryValues(){
+    string getMemoryValues = rmlib1->getAnythingFromServer("getAllMemoryValues");
+    cout<<getMemoryValues<<endl;   
+    interfaz(); 
 }
