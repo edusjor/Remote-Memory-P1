@@ -1,7 +1,7 @@
 //
 // Created by edulubu on 28/08/17.
 //
-
+//Servidor ACTIVO
 #ifndef SERVIDORACTIVO_SERVER_H
 #define SERVIDORACTIVO_SERVER_H
 
@@ -41,15 +41,17 @@ private:
 
     static void* playSocket(void* var);
 
-public:
-    Server();
-    void aceptarEimprimir();
-
     int socketClient(int puerto); 
     static void sincronizar();
     int verifServPas();
     string enviarDato(string dato);
     string enviarTodo();
+
+public:
+    Server();
+    void aceptarEimprimir();
+
+    
 
 };
 

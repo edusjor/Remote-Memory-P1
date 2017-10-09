@@ -24,10 +24,7 @@ List<string> list_1; //lista global
 int usoDeMemoria=0;
 
 Server::Server() {
-
-
     
-
     int yes = 1;
 
     /* ---------- ESTABLISHING SOCKET CONNECTION ----------*/
@@ -113,7 +110,6 @@ void* Server::playSocket(void* socket_desc){
     {
         //end of string marker
         client_message[read_size] = '\0';
-        cout <<endl<<endl<< "Mensaje recibido del cliente: "<<client_message<<endl;
 
         //itera el string del char recibido en el mensaje 
         //para separar la llave, el valor y el tamano
@@ -161,14 +157,11 @@ void* Server::playSocket(void* socket_desc){
         //hace la prueba de conexion
         if(operacion==operacion0){ 
 
-            cout << "pruebaConexion pass."<<endl;
             string respuesta="pruebaConexionSuccess";
            
             char *chrResp = &respuesta[0u];                //convierte la llave de string a char
             write(sock , chrResp , 1024);  //envia la llave creada al cliente
-            cout<<"Enviado: "<<endl;
         }
-
 
 
 
@@ -196,8 +189,6 @@ void* Server::playSocket(void* socket_desc){
             Sincronizacion sinc;
             
             sinc.sincronizar(dato);
-            cout<<"sincronizar"<<endl;
-
         }
 
 

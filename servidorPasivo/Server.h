@@ -1,7 +1,7 @@
 //
 // Created by edulubu on 28/08/17.
 //
-
+//servidor PASIVO
 #ifndef SERVIDORACTIVO_SERVER_H
 #define SERVIDORACTIVO_SERVER_H
 
@@ -23,7 +23,6 @@
 using namespace std;
 
 class Server {
-
 private:
     static vector<Client> clients;
 
@@ -42,6 +41,7 @@ private:
 
     static void* iniciarSincro(void*);
 
+    int socketClient(int puerto);
 
 
 
@@ -49,7 +49,7 @@ public:
     Server();
     void aceptarEimprimir();
 
-    int socketClient(int puerto);
+    
 
 
 };

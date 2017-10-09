@@ -513,7 +513,7 @@ string List<T>::retornarTodo()
     //separadorNodo #
     //separa dato @
     string datos="";
-    string formato="-----------------\nLlave       Valor\n";
+    string formato="-----------------\nLlave       Valor\n";;
     while (temp) {
         
             datos=datos+temp->llave+": "+temp->valor+"\n";

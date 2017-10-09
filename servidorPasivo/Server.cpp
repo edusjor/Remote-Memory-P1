@@ -23,12 +23,8 @@
 List<string> list_1; //lista global
 int usoDeMemoria=0;
 
-
 Server::Server() {
 
-    //pthread_t thread_id_SINCserver;
-    //pthread_create( &thread_id_SINCserver , NULL ,  iniciarSincro ,  NULL);         
-    
     int yes = 1;
 
     /* ---------- ESTABLISHING SOCKET CONNECTION ----------*/
@@ -74,7 +70,6 @@ void Server::aceptarEimprimir() {
 
         //espera aqui hasta que algun cliente se conecte entonces lo acepta y lo asigna al espacio reservado
         c->sock = accept(client, (struct sockaddr *) &server_addr, &size); 
-        cout<<"Cliente escuchado: "<<client<<endl;
 
         // first check if it is valid or not
         if (c->sock < 0) {
@@ -115,7 +110,6 @@ void* Server::playSocket(void* socket_desc){
     {
         //end of string marker
         client_message[read_size] = '\0';
-        cout <<endl<<endl<< "Mensaje recibido del cliente: "<<client_message<<endl;   
         string operacion="",llave="",valor="",size="" ;
         
 
@@ -123,12 +117,6 @@ void* Server::playSocket(void* socket_desc){
         //para separar la llave, el valor y el tamano
         string strclient_message = string(client_message); //convierte el mensaje del cliente a string
         
-
-
-
-
-
-
         int cont=0;
         for(int i=0; i < strclient_message.length(); i++){
             if ((strclient_message[i])==separador[0]){
@@ -157,6 +145,8 @@ void* Server::playSocket(void* socket_desc){
 
 
 
+
+       
         string operacion0="pruebaConexion";
         string operacion1="guardarValor";
         string operacion2="getValor";
@@ -164,6 +154,7 @@ void* Server::playSocket(void* socket_desc){
         string operacion4="getAllMemoryValues";
         string operacion5="pruebaConexionDesdeActivo";
         string operacion6="sincActivoToPasivo";
+        string operacion7="sincPasivoToActivo";
 
 
 
@@ -175,12 +166,10 @@ void* Server::playSocket(void* socket_desc){
         //hace la prueba de conexion
         if(operacion==operacion0){ 
 
-            cout << "pruebaConexion pass."<<endl;
             string respuesta="pruebaConexionSuccess";
            
             char *chrResp = &respuesta[0u];                //convierte la llave de string a char
             write(sock , chrResp , 1024);  //envia la llave creada al cliente
-            cout<<"Enviado: "<<endl;
         }
 
 
@@ -200,17 +189,12 @@ void* Server::playSocket(void* socket_desc){
             clientKeysControl+=(llave+separador);         //concatena a la variable de control de llaves de este usuario la nueva llave creada
 
             list_1.add_head(llave,valor,size);          //guarda en la lista la llave, el valor y tamano del dato
-            cout<<"llave en server: "<<llave<<endl;
+            
             char *chrLlave = &llave[0u];                //convierte la llave de string a char
             write(sock , chrLlave , strlen(chrLlave));  //envia la llave creada al cliente
             usoDeMemoria+=(sizeof(valor));            //Le suma a una variable de control de memoria el tamano del valor guardado
-            cout<<"operacion: "<<operacion<<endl;
-            cout<<"valor: "<<val<<endl;
 
-
-            cout<<"llave en server: "<<chrLlave<<endl;
         }
-
 
 
 
@@ -240,13 +224,31 @@ void* Server::playSocket(void* socket_desc){
 
 
 
+        ////////////////////////////////////////
+        //getMemoryUsage
+        //envia al cliente el uso de memoria actual, en bytes
+        if (operacion==operacion3){ 
 
-
-
-
-
+                string str_UsoDeMemoria=to_string(usoDeMemoria/4)+" bytes";       //convierte a string la var de control de memoria
+                char *chrDato = &str_UsoDeMemoria[0u];                          //convierte de string a char
+                write(sock , chrDato , strlen(chrDato));                        //envia el dato de control de memoria al cliente
+            }
 
        
+
+
+
+        ////////////////////////////////////////
+        //getAllMemoryValues
+        //envia al cliente lo que hay en memoria actual
+        if (operacion==operacion4){ 
+
+                string str_Memory_values = list_1.retornarTodo();
+                char *chrDato = &str_Memory_values[0u];                          //convierte de string a char
+                write(sock , chrDato , strlen(chrDato));                        //envia el dato de control de memoria al cliente
+        }
+
+
 
 
 
@@ -261,9 +263,6 @@ void* Server::playSocket(void* socket_desc){
             write(sock , chrResp , 1024);  //envia la respuesta 
 
         }
-
-
-
 
 
 
@@ -285,9 +284,7 @@ void* Server::playSocket(void* socket_desc){
             string val="";
             string siz=""; //esta var la hace con sizeof en local
 
-            cout<<"valor op 5: "<<valor<<endl;
             int cont=0;
-            cout<<"tamano: "<<valor.length()<<endl;
             int tamano=valor.length();
 
             int flag = 0;
@@ -328,36 +325,23 @@ void* Server::playSocket(void* socket_desc){
             valor="";
         }
 
+        //////////////////////////////////////
+        //El activo le pide al pasivo los datos guardados anteriormente
+        //sincPasivoToActivo
+        if (operacion==operacion7){
 
-         ////////////////////////////////////////
-        //getMemoryUsage
-        //envia al cliente el uso de memoria actual, en bytes
-        if (operacion==operacion3){ 
+            string datosTodos = list_1.iterarTodo();//trae todos los datos de la lista   
+            cout<<"datos todos: "<<datosTodos<<endl;
 
-                string str_UsoDeMemoria=to_string(usoDeMemoria/4)+" bytes";       //convierte a string la var de control de memoria
-                char *chrDato = &str_UsoDeMemoria[0u];                          //convierte de string a char
-                write(sock , chrDato , strlen(chrDato));                        //envia el dato de control de memoria al cliente
-            }
+            string formatDatos="sincActivoToPasivo#"+datosTodos+"#null#null";
+            char* chrDato = &formatDatos[0u];
+            write(sock , chrDato , strlen(chrDato));
 
 
-        ////////////////////////////////////////
-        //getAllMemoryValues
-        //envia al cliente lo que hay en memoria actual
-        if (operacion==operacion4){ 
-
-                string str_Memory_values = list_1.retornarTodo();
-                char *chrDato = &str_Memory_values[0u];                          //convierte de string a char
-                write(sock , chrDato , strlen(chrDato));                        //envia el dato de control de memoria al cliente
         }
 
 
-
-
-
-        
-
-        cout<<"passss"<<endl;
-
+         
 
         //clear the message buffer
         memset(client_message, 0, 1024);   
