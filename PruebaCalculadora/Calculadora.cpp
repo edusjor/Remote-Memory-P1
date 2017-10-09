@@ -193,6 +193,7 @@ string Calculadora::getValores(string keysDeOperacion){
 }
 
 
+
 //pide la cantidad de bytes utilizado en memoria 
 void Calculadora::MemoryUsage(){   
     string getMemoryUsage = rmlib1->getAnythingFromServer("getMemoryUsage");

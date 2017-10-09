@@ -110,20 +110,19 @@ List<string> list_1; //lista global de estructura de control en libreria
 using  namespace std;
 
 
-/////////////////////////////////
 //rmlib
 class rmlib{
 public:
+    
+    void rm_init(char* ip, int port, char* ipHA, int portHA);   //verifica si activo o pasivo estan disponibles llamando a la funcion socketClient
+    int socketClient(int,string);                               // inicia el socket si el server esta disponible y envia uno si hay exito, 0 si no.
+    string enviarDato(char* dato);                              //Envia dato al servidor
 
-    int socketClient(int,string);
-    void rm_init(char* ip, int port, char* ipHA, int portHA);
-    string enviarDato(char* dato);
-
-    void savellaveEnListaLocal(string llaveLocal,string llaveDelServer);
-    string getLlaveDelServerEnLocal(string llaveLocal);
-    string getAllLlavesDelServerEnLocal(string);
-    string rm_get(string llave);
-    string getAnythingFromServer(string request);
+    void savellaveEnListaLocal(string,string);                  //guarda la llave restornada desde el server en la lista de control local
+    string getLlaveDelServerEnLocal(string llaveLocal);         //(no me acuerdo)     
+    string getAllLlavesDelServerEnLocal(string);                //trae todas las llaves  guardadas en local con la llave de control
+    string rm_get(string llave);                                //retorna el valor en el server asociado a la llave guardada en la llave local de control
+    string getAnythingFromServer(string request);               //hace "cualquier" peticion al server  ej: traer los bytes usados
 
 private:
     char* ipActivo;
@@ -131,22 +130,12 @@ private:
     int portActivo;
     int portPasivo;
 
-    int port;
-
-    int portAvailable;
     int n;
-
     int client;
-
-    int isActivo;
-
     int bufsize = 1024;
     char buffer[1024];
 
-    //TCPClient tcp;
-
-
-    string rm_new(char*  dato);
+    string rm_new(char*  dato);                                 //envia un nuevo dato al server y recibe la llave del dato guardado
 };
 
 
@@ -156,9 +145,7 @@ void rmlib::rm_init(char* ip, int port, char* ipHA, int portHA){
     this->ipPasivo = ip;
     this->portActivo = portHA;
     this->portPasivo = port;
-    this->portAvailable=portActivo;
-    this->isActivo=true;
-
+  
     //inicia Socket
     cout<<"Conectando al servidor Activo"<<endl;
     if (socketClient(portActivo,ipActivo)==0){
@@ -175,11 +162,10 @@ void rmlib::rm_init(char* ip, int port, char* ipHA, int portHA){
 /*
 void rmlib::rm_delete(rmRef_H* handler){
 }
-
 */
-int rmlib::socketClient(int puerto,string ip) {
 
-   
+//crea el socket client segun el puerto dado y retorna 0 o 1 segun este o no disponible el server
+int rmlib::socketClient(int puerto,string ip) {
 
     struct sockaddr_in server_addr;
 
@@ -197,54 +183,49 @@ int rmlib::socketClient(int puerto,string ip) {
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(puerto);
 
-
-    if (connect(client, (struct sockaddr *) &server_addr, sizeof(server_addr))<0){ //si no se conecta
+    if (connect(client, (struct sockaddr *) &server_addr, sizeof(server_addr))<0){ //si no se conecta al server del puerto actual retorna 0
         return 0;
     }
     else{
         return 1;
     }
-
 }
 
 
 
 
-string rmlib::enviarDato(char* dato){
 
-    cout<<"Enviando dato al servidor Activo"<<endl;
+//verifica que halla algun servidor disponible y Envia dato al servidor
+string rmlib::enviarDato(char* dato){
 
     if(socketClient(portActivo,ipActivo)==0){ //si el activo no esta disponible se  conecta al pasivo
         if (socketClient(portPasivo,ipPasivo)==0){
-            cout<<"Ningun servidor esta disponible"<<endl;        }
-    }
-
-    string llaveDelServer = rm_new(dato);
+            cout<<"Ningun servidor esta disponible"<<endl;   
+        }else
+            cout<<"Activo no disponible, conectado al servidor Pasivo"<<endl;
+    }else
+        cout<<"Conectado al servidor Activo"<<endl;
+    
+    string llaveDelServer = rm_new(dato); 
 
     if (llaveDelServer!="0"){
         cout<<"Exito!, libreria y servidor han intercambiado datos exitosamente"<<endl<<endl<<endl;
         return llaveDelServer;
 
-    }else{
-        cout<<"Hubo un error no se puede hacer la conexion"<<endl;           
-    }
-        
-        
-
+    }else
+        cout<<"Hubo un error no hay conexion "<<endl;           
 }
-string rmlib::rm_new(char* dato){
-        cout<<endl<<endl<<endl<<"cliente conectandose "<<client<<endl;
 
-        send(client,"pruebaConexion#null#null#null",1024,0);
-        cout<<"cliente conectandose "<<client<<endl;
-        n=recv(client, buffer, bufsize, 0);
-        if (n<=0){
+//prueba la conexion al sever, envia los datos y recibe la llave creada por el server para esos datos y la retorna
+string rmlib::rm_new(char* dato){
+      
+        send(client,"pruebaConexion#null#null#null",1024,0); //envia datos para hacer prueba de conexion en formato:   "operacion a realizar#null#null#null"
+
+        n = recv(client, buffer, bufsize, 0); //respuesta de la prueba 
+        if (n<=0){   
             cout << "servidor no conectado"<<endl<<endl<<endl<<endl<<endl;
             return "0";
-        }
-        cout<<"estado de la conexion con server "<<client<<": "<<buffer<<endl;
-       
-        
+        }        
 
         memset(buffer, 0, 1024);
 
@@ -252,58 +233,64 @@ string rmlib::rm_new(char* dato){
         recv(client, buffer, bufsize, 0);
         
         string llaveEnServer=buffer;
-
-        cout<<"Llave del server ahora en el cliente: "<<buffer<<endl;
-
-        //guardar buffer(llave) en la estructura de control
         
-        cout<<endl<<"__La conexion fue exitosa__"<<endl<<endl;
+        cout<<endl<<"_______conection succesful_______"<<endl<<endl;
 
     return llaveEnServer;
 }
 
 
 //para hacer peticion al server se manda: operacion a realizar, llave, valor, tamano.
-//retorna el valor asociado a la llave
+//retorna el valor en el server asociado a la llave
 string rmlib::rm_get(string llave){
-
 
     string operacion="getValor#";
     string datosize= "#null#null";
-    string param=operacion+llave+datosize;
-    cout<<"param: "<<param<<endl;
+    string param=operacion+llave+datosize;      //getValor#llave#null#null
+
     char *chrParam = &param[0u]; //convierte string a char
 
-    
-
-
     write(client , chrParam , strlen(chrParam));
+
     //Respuesta del server
-    cout<<"Llaveeee: "<<chrParam<<endl;
     memset(buffer, 0, 1024);
     n=recv(client, buffer, bufsize, 0);
-    cout << "buffer: "<< buffer<<endl;
 
     if (n<=0){
-        cerr <<"servidor desconectado"<<endl;
         cout << "servidor no conectado"<<endl;
         return "NoServerFound";
     }
 
-    string valorEnServer=buffer;
-    if(valorEnServer=="NoDataFound")
+    if(buffer=="NoDataFound")
         return "NoDataFound";
 
-    return valorEnServer;
+    return buffer;   
 }
+
+
+
+//pide lo que sea al server y este responde con lo pedido
+string rmlib::getAnythingFromServer(string request){
+    
+    char *chrParam = &request[0u]; //convierte string a char
+
+    write(client , chrParam , strlen(chrParam));
+    memset(buffer, 0, 1024);
+    n=recv(client, buffer, bufsize, 0);
+
+    string requestRespuesta=buffer;
+    return buffer;
+
+}
+
+
 
 //guarda la llave proveida por el servidor en la variable dato segun una llave local
 void rmlib::savellaveEnListaLocal(string llaveLocal,string llaveDelServer){
     list_1.add_head(llaveLocal,llaveDelServer,"null");
-
 }
 
-//busca segun una llave local, la llave del server guardada en la lista local
+//busca segun una llave local, la llave del server guardada en la lista local(no me acuerdo)
 string rmlib::getLlaveDelServerEnLocal(string llaveLocal){
     string dato = list_1.searchData(llaveLocal);
     if (dato!="0"){
@@ -312,7 +299,7 @@ string rmlib::getLlaveDelServerEnLocal(string llaveLocal){
     return "0"; //no existe esa llave en local
 }
 
-//busca segun una llave local, la llave del server guardada en la lista local
+//busca segun una llave local, las llaves del server guardadas en la lista local
 string rmlib::getAllLlavesDelServerEnLocal(string llaveLocal){
     string llaves = list_1.searchallKeys(llaveLocal);
     if (llaves!="0"){
@@ -320,29 +307,6 @@ string rmlib::getAllLlavesDelServerEnLocal(string llaveLocal){
     }
     return "0"; //no existe esa llave en local
 }
-
-string rmlib::getAnythingFromServer(string request){
-    
-    char *chrParam = &request[0u]; //convierte string a char
-
-
-    write(client , chrParam , strlen(chrParam));
-    memset(buffer, 0, 1024);
-    n=recv(client, buffer, bufsize, 0);
-
-    string requestRespuesta=buffer;
-    return requestRespuesta;
-
-}
-/*
-string rmlib::buscarIndicesDeLlave(string llaveLocal){
-}*/
-
-
-
-
-
-
 
 
 
@@ -386,8 +350,9 @@ string rmlib::buscarIndicesDeLlave(string llaveLocal){
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Constructor por defecto
-// nodo, funciones
+// 
+// nodo
+//funciones
 template<typename T>
 
 Node<T>::Node()
@@ -434,7 +399,8 @@ Node<T>::~Node() {}
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//lista, funciones
+//lista 
+//funciones
 // Constructor por defecto
 template<typename T>
 List<T>::List()
