@@ -159,10 +159,15 @@ void Calculadora::guiOperacion(string operacion){ // muestra los cin para la ent
 void Calculadora::mostrarPrevOperaciones(string localKey){
 
     string keysDeOper = rmlib1->getAllLlavesDelServerEnLocal(localKey); //string con todas las llaves de la llave en el parametro oper //LOCAL
-    string operacionesPreviasDelServer = getValores(keysDeOper);//llama la funcionLocal para que traiga los valores de las llavesServer del server en un solo string        
+    //string operacionesPreviasDelServer = getValores(keysDeOper);//llama la funcionLocal para que traiga los valores de las llavesServer del server en un solo string        
     string resultados = getValores(keysDeOper);//llama la funcionLocal para que traiga los valores de las llavesServer del server en un solo string        
 
+    if (resultados =="noServerFound"){
+        cout<<"servidores no available"<<endl;
+        interfaz();
+    }    
     cout<<"Todas los resultados de "<<localKey<<" anteriores: "<<resultados<<endl;
+    
     cout<<"--------------------------------------------------------------------------- "<<endl<<endl;
 
     interfaz();
@@ -182,7 +187,11 @@ string Calculadora::getValores(string keysDeOperacion){
                
             char *chrKey = &key[0u]; //convierte string a char la llave q se mandara al server
 
-            datosDelServer+="=>"+rmlib1->rm_get(chrKey)+"\n";//envia la llave a la funcion en rmlib para que retorne el valor guardado en server
+
+            string dataGot =rmlib1->rm_get(chrKey);
+            if (dataGot=="noServerFound")
+                return "noServerFound";
+            datosDelServer+="=>"+dataGot+"\n";//envia la llave a la funcion en rmlib para que retorne el valor guardado en server
             key="";
         }
         else{

@@ -22,6 +22,7 @@
 
 List<string> list_1; //lista global
 int usoDeMemoria=0;
+int estadoPasivo=true;
 
 Server::Server() {
     
@@ -66,6 +67,8 @@ Server::Server() {
 Client *c;
 void Server::aceptarEimprimir() {
 
+    Sincronizacion sinc;
+    sinc.getPasivoSinc();
     while (1) {
         
         c = new Client(); //reserva un nuevo "espacio" para el siguiente cliente que se conecte
@@ -273,8 +276,20 @@ void* Server::playSocket(void* socket_desc){
 
 
 
-int flagPasivoisON=false;
 
+
+
+
+
+
+
+
+
+
+
+
+int flagPasivoisON=false;    //flag para controlar si el pasivo esta activo y asi sincronizarlo activoToPasivo
+int sincPasivoToActivo = false; //flag para controlar si el pasivo esta activo y asi sincronizarlo pasivoToActivo
 
 //sincronizar a pasivo
 void Sincronizacion::sincronizar(string dato){
@@ -366,6 +381,105 @@ int Sincronizacion::socketClient(int puertoPasivo) {
 
 }
 
+
+
+
+//Pide los datos de sincronizacion al pasivo
+void Sincronizacion::getPasivoSinc(){
+
+    int i=1;
+    if(socketClient(puertoPasivo)==i){//crea la conexion
+        cout<<"pasivo conectado 1"<<endl;
+        if (verifServPas() ==1){//verifica la conexion, si pasivo esta activo
+            cout<<"pasivo conectado 2 "<<endl;
+
+            if (sincPasivoToActivo==true){
+                //no hacer nada. Activo si esta sincronizados con pasivo
+            }
+
+            if (sincPasivoToActivo==false){
+                sincPasivoToActivo=true;
+                
+                //pedir datos
+                pedirDatosdeSINC();
+            }              
+        }
+    }
+}
+
+//pide los datos de sincronizacion al pasivo. Si no esta sincronizados
+void Sincronizacion::pedirDatosdeSINC(){
+    string formatDatos="sincPasivoToActivo#null#null#null";
+    char* chrDato = &formatDatos[0u];
+
+    cout<<"hola1"<<endl;
+    write(client_SINC , chrDato , strlen(chrDato));
+cout<<"hola2"<<endl;
+    string size="";
+    //int read_size;
+    //client_message[read_size] = '\0';
+
+    char client_message[1024];
+    recv(client_SINC , client_message , 1024 , 0);
+cout<<"hola3"<<endl;
+
+    string strclient_message = string(client_message); //convierte el mensaje del cliente a string
+        
+
+    string separador1="&";
+    string separador2="@";
+
+    //itera el string del valor recibido en el mensaje 
+    //string llave="";
+    string valor=strclient_message;
+
+
+    string llav="";
+            string val="";
+            string siz=""; //esta var la hace con sizeof en local
+
+            int cont=0;
+            int tamano=valor.length();
+
+            int flag = 0;
+            while (cont<=tamano){        //separa al formato  llave&valor@llave2&valor@
+                if (valor[cont]==separador1[0]){
+                    flag=5;
+                }
+
+                if(valor[cont] == separador2[0]){
+                    flag=2;
+                }
+
+                if (flag==0){
+                    llav+=valor[cont];
+                }
+
+                if(flag==1)
+                    val+=valor[cont];
+                    
+                if (flag ==5){
+                    flag =1;
+                }
+                if (flag == 2){
+                    size=to_string(sizeof(val));
+                    list_1.add_head(llav,val,siz);
+
+                    usoDeMemoria+=sizeof(val);
+
+                    flag = 0;
+                    cout <<"val: "<<val<<endl;
+                    llav="";
+                    val="";
+                    size="";
+                }
+         
+                cont +=1;
+            }
+            valor="";
+            cout<<"Activo sincronizado con pasivo"<<endl;
+
+}
 
 
 

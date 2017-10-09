@@ -261,10 +261,9 @@ void* Server::playSocket(void* socket_desc){
             string respuesta="pruebaConexionDesdeActivoSuccess";
             char *chrResp = &respuesta[0u];                //convierte la llave de string a char
             write(sock , chrResp , 1024);  //envia la respuesta 
-
         }
 
-
+ 
 
 
         ////////////////////////////////////////
@@ -275,7 +274,6 @@ void* Server::playSocket(void* socket_desc){
             string separador1="&";
             string separador2="@";
 
-    
             //itera el string del valor recibido en el mensaje 
             //string llave="";
             valor=llave;
@@ -330,14 +328,21 @@ void* Server::playSocket(void* socket_desc){
         //sincPasivoToActivo
         if (operacion==operacion7){
 
-            string datosTodos = list_1.iterarTodo();//trae todos los datos de la lista   
-            cout<<"datos todos: "<<datosTodos<<endl;
 
-            string formatDatos="sincActivoToPasivo#"+datosTodos+"#null#null";
+            string datosTodos = "";
+            datosTodos = list_1.iterarTodo();//trae todos los datos de la lista   
+            cout<<"Todos los datos: "<<datosTodos<<endl;
+
+            string formatDatos=datosTodos;
+
+            if (formatDatos=="");
+                formatDatos="NoDataFound";
+            
             char* chrDato = &formatDatos[0u];
+            cout<<"hi1"<<endl;
             write(sock , chrDato , strlen(chrDato));
-
-
+            cout<<"hi2"<<endl;
+            
         }
 
 
