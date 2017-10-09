@@ -291,7 +291,7 @@ void* Server::playSocket(void* socket_desc){
             int tamano=valor.length();
 
             int flag = 0;
-            while (cont<=tamano){
+            while (cont<=tamano){        //separa al formato  llave&valor@llave2&valor@
                 if (valor[cont]==separador1[0]){
                     flag=5;
                 }
@@ -311,54 +311,19 @@ void* Server::playSocket(void* socket_desc){
                     flag =1;
                 }
                 if (flag == 2){
-
+                    size=to_string(sizeof(val));
                     list_1.add_head(llav,val,siz);
+
+                    usoDeMemoria+=sizeof(val);
+
                     flag = 0;
                     cout <<"val: "<<val<<endl;
                     llav="";
                     val="";
                     size="";
                 }
-                /*if (flag==2)
-                    flag=3;*/
+         
                 cont +=1;
-
-                
-
-            
-
-            /*for(int i=0; i <= tamano; i++){
-                cout<<"valor i: "<<valor[i]<<endl;
-                if ((valor[i])==separador1[0]){
-                    cont=1;
-                }
-
-                if ((valor[i])==separador2[0]){
-                    cont=2;
-                }
-
-                if(cont==0)
-                    llav=llav+valor[i];
-
-                if(cont==1)
-                    val=val+valor[i];
-
-                if(cont==2){ 
-                    //guardar en lista
-                    usoDeMemoria+=sizeof(val);
-                    size=to_string(sizeof(valor));
-                    list_1.add_head(llav,val,siz);          //guarda en la lista la llave, el valor y tamano del dato
-                    cont=0;
-                    cout<<"val: "<<val<<endl;
-                    cout<<"i: "<<i<<endl;
-
-                llav="";
-                valor="";
-                size="";
-                }   
-                cout<<"se sale en i= "<<i<<endl;
-                
-                */
             }
             valor="";
         }
