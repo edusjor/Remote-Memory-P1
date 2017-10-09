@@ -13,140 +13,34 @@
 using namespace std;
 
 rmlib* rmlib1;
-List<string>  list1;
 
-int Calculadora::guiOperacion(string operacion){
-    list1.add_head("1","2","3");
-    int num1;
-    int num2;
-    cout <<"Digite el primer numero: "<<endl<<endl;
-    cin>>num1;
-    cout <<"Digite el segundo numero: "<<endl<<endl;
-    cin>>num2;
-    if (operacion == "+")
-        int sum=num1+num2;
-        cout <<"La suma es: "<< num1+num2 <<endl<<endl;
+Calculadora::Calculadora()  {
+    //iniciar socket
+    char* ipAct = "127.0.0.1";
+    char* ipPas = "127.0.0.1";
 
-        string oper="guardarValor";
-        string llave= "null";
-        string valor=to_string(num1+num2);
-        string size=to_string(sizeof(valor));
+    int portAct=8888;
+    int portPas=8889;
 
-
-        string parametros = oper+"#"+llave+"#"+valor+"#"+size;
-        char *chrParametros = &parametros[0u]; //convierte string a char
-
-        string llaveDelServer=rmlib1->enviarDato(chrParametros);
-
-        if (llaveDelServer=="0"){
-            cout<<"error, servidores desconectados"<<endl;
-            //reconectar
-        }
-        else{cout<<"por aqui pasa 2"<<endl;
-            rmlib1->savellaveEnListaLocal("sumas",llaveDelServer); //guarda la llave del server con una llave local
-            cout<<"por aqui pasa 3"<<endl;
-        }
-
-        //rmlib1->savellaveEnListaLocal("sumas",llaveDelServer);
-        cout<<"\nllave sumas: "<<rmlib1->getAllLlavesDelServerEnLocal("sumas")<<endl<<endl;
-        
-        
-
-        interfaz();
-
-
-    if (operacion == "-")
-        cout <<"La resta es: "<< num1-num2<<endl<<endl;
-    if (operacion == "*")
-        cout <<"El producto es: "<< num1*num2<<endl<<endl;
-    if (operacion == "/")
-        cout <<"La division es: "<< num1/num2<<endl<<endl;
-    interfaz();
-
-}
-
-int Calculadora::suma(){
-    guiOperacion("+");
-    return 0;
-}
-int Calculadora::resta(){
-    guiOperacion("-");
-    return 0;
-}
-int Calculadora::multiplicacion(){
-    guiOperacion("*");
-    return 0;
-}
-int Calculadora::division() {
-    guiOperacion("/");
-    return 0;
-}
-
-//muestra todas las sumas anteriores
-void Calculadora::mostrarPrevSumas(){
- 
-    string keysDeSumas="";  //guarda todas las keys del servidor guardadas en local en la llave "sumas"
-  
-    keysDeSumas = rmlib1->getAllLlavesDelServerEnLocal("sumas"); //string con todas las llaves de la llave "sumas" //LOCAL
-    cout<<"\nllavesServer en llaveLocal sumas: "<<keysDeSumas<<endl<<endl;
+    rmlib1 = new rmlib();
     
-    string sumasPreviasDelServer = getValores(keysDeSumas);//llama la funcionLocal para que traiga los valores de las llavesServer del server en un solo string        
-
-    cout<<"Todas los resultados de sumas anteriores: "<<sumasPreviasDelServer<<endl<<endl;
-    cout<<"--------------------------------------------------------------------------- "<<endl;
+    rmlib1->rm_init(ipPas,portPas,ipAct,portAct);
 
     interfaz();
-
-}
-
-//recibe las llaves del servidor guardadas en local en string con separador: "#"
-//retorna los datos de las llaves en servidor, en string con mismo separador
-string Calculadora::getValores(string keysDeOperacion){
-    string datosDelServer="";
-    string separador="#";
-    string key="";
-
-    for(int i=0; i<keysDeOperacion.length(); i++){
-            
-
-        if ((keysDeOperacion[i])==separador[0]){
-               
-            char *chrKey = &key[0u]; //convierte string a char la llave q se mandara al server
-
-            datosDelServer+="=>"+rmlib1->getDato(chrKey);//envia la llave a la funcion en rmlib para que retorne el valor guardado en server
-            key="";
-        }
-        else{
-            key=key+keysDeOperacion[i];
-        }
-    }
-    return datosDelServer;
-}
-
-void Calculadora::MemoryUsage(){
-    string getMemoryUsage = rmlib1->getAnythingFromServer("getMemoryUsage");
-    cout<<"uso de memoria: "<<getMemoryUsage<<endl;
-
-}
-
-//trae todos los valores guardados en memoria con sus llaves
-void Calculadora::getAllMemoryValue(){
-    
-    string AllMemoryValue = rmlib1->getAnythingFromServer("getAllMemoryValue");
-    cout<<"todos los datos y llaves en memoria: "<<AllMemoryValue<<endl<<endl;
-
 }
 
 
-
-int Calculadora::interfaz(){
-    cout << "1-Suma"<<endl;
+void Calculadora::interfaz(){
+    cout <<endl<<endl<< "1-Suma"<<endl;
     cout << "2-Restar"<<endl;
     cout << "3-Multiplicar"<<endl;
     cout << "4-Dividir"<<endl;
     cout << "5-Mostrar Previas Sumas"<<endl;
-    cout << "6-Salir"<<endl;
-    cout << "7-Memory Usage"<<endl<<endl;
+    cout << "6-Mostrar Previas Restas"<<endl;
+    cout << "7-Mostrar Previas Multiplicaciones"<<endl;
+    cout << "8-Mostrar Previas Divisiones"<<endl;
+    cout << "9-Memory Usage"<<endl;
+    cout << "0-Salir"<<endl<<endl<<endl;
 
 
     int choice;
@@ -167,32 +61,146 @@ int Calculadora::interfaz(){
             division();
             break;
         case 5:
-            mostrarPrevSumas();
+            mostrarPrevOperaciones("sumas");
+            break;
+        case 6:
+            mostrarPrevOperaciones("restas");
+            break;
+        case 7:
+            mostrarPrevOperaciones("multiplicaciones");
+            break;
+        case 8:
+            mostrarPrevOperaciones("divisiones");
+            break;
+        case 9:
+            MemoryUsage();
             break;
 
-        case 6:
+        case 0:
+            //Borrar datos de las llaves (implementar)
             exit(true);
-        case 7:
-            MemoryUsage();
-
     }
-
-    return 0;
 }
 
-Calculadora::Calculadora()  {
-    //iniciar socket
-    char* ipAct = "127.0.0.1";
-    char* ipPas = "127.0.0.1";
 
-    int portAct=8888;
-    int portPas=8889;
 
-    rmlib1 = new rmlib();
+void Calculadora::suma(){
+    guiOperacion("sumas");
+}
+void Calculadora::resta(){
+    guiOperacion("restas");
+}
+void Calculadora::multiplicacion(){
+    guiOperacion("multiplicaciones");
+}
+void Calculadora::division() {
+    guiOperacion("divisiones");   
+}
+
+
+
+
+void Calculadora::guiOperacion(string operacion){ // muestra los cin para la entrada del usuario. hace la operacion y el envio al server con la libreria
+    int num1;
+    int num2;
+    cout <<"Digite el primer numero: "<<endl<<endl;
+    cin>>num1;
+    cout <<"Digite el segundo numero: "<<endl<<endl;
+    cin>>num2;
+
     
-    rmlib1->rm_init(ipPas,portPas,ipAct,portAct);
+    string oper="guardarValor";        
+    string llave= "null";
+    string valor="";
+
+    if (operacion == "sumas"){ 
+        valor=to_string(num1+num2);
+        cout <<"La suma es: "<< valor <<endl<<endl;
+    }
+    if (operacion == "restas"){ 
+        valor=to_string(num1-num2);
+        cout <<"La resta es: "<< valor <<endl<<endl;
+    }
+    if (operacion == "multiplicaciones"){ 
+        valor=to_string(num1*num2);
+        cout <<"La multiplicacion es: "<< valor <<endl<<endl;
+    }
+    if (operacion == "divisiones"){ 
+        valor=to_string(num1/num2);
+        cout <<"La division es: "<< valor <<endl<<endl;
+    }
+
+    
+    string size=to_string(sizeof(valor)); //manda el tamano en bits
 
 
+    string parametros = oper+"#"+llave+"#"+valor+"#"+size;
+    char *chrParametros = &parametros[0u]; //convierte string a char
+
+    string llaveDelServer=rmlib1->enviarDato(chrParametros); //envia el dato en formato "operacion#null#valor#tamano" y resive un string con la llave que crea el server
+
+    if (llaveDelServer=="0"){
+        cout<<"error, servidores desconectados"<<endl;
+        //reconectar
+    }
+    else{
+        rmlib1->savellaveEnListaLocal(operacion,llaveDelServer); //guarda la llave del server con una llave local
+    }
+
+    cout<<"\nllaves de operacion " <<operacion<<": "<<rmlib1->getAllLlavesDelServerEnLocal(operacion)<<endl<<endl;//trae todas las llaves guardadas en local del server.
+    
     interfaz();
 
 }
+
+
+
+//muestra las operaciones anteriores asociadas a la llave en oper
+void Calculadora::mostrarPrevOperaciones(string localKey){
+
+    string keysDeOper = rmlib1->getAllLlavesDelServerEnLocal(localKey); //string con todas las llaves de la llave en el parametro oper //LOCAL
+    string operacionesPreviasDelServer = getValores(keysDeOper);//llama la funcionLocal para que traiga los valores de las llavesServer del server en un solo string        
+    string resultados = getValores(keysDeOper);//llama la funcionLocal para que traiga los valores de las llavesServer del server en un solo string        
+
+    cout<<"Todas los resultados de "<<localKey<<" anteriores: "<<resultados<<endl;
+    cout<<"--------------------------------------------------------------------------- "<<endl<<endl;
+
+    interfaz();
+}
+
+
+//recibe las llaves del servidor guardadas en local en string con separador: "#"
+//retorna los datos de las llaves en servidor, en string con mismo separador
+string Calculadora::getValores(string keysDeOperacion){
+    string datosDelServer="\n";
+    string separador="#";
+    string key="";
+
+    for(int i=0; i<keysDeOperacion.length(); i++){
+
+        if ((keysDeOperacion[i])==separador[0]){
+               
+            char *chrKey = &key[0u]; //convierte string a char la llave q se mandara al server
+
+            datosDelServer+="=>"+rmlib1->rm_get(chrKey)+"\n";//envia la llave a la funcion en rmlib para que retorne el valor guardado en server
+            key="";
+        }
+        else{
+            key=key+keysDeOperacion[i];
+        }
+    }
+    return datosDelServer;
+}
+
+
+//pide la cantidad de bytes utilizado en memoria 
+void Calculadora::MemoryUsage(){   
+    string getMemoryUsage = rmlib1->getAnythingFromServer("getMemoryUsage");
+    cout<<endl<<"Uso de memoria: "<<getMemoryUsage<<endl<<endl<<endl;
+    interfaz();
+}
+
+
+
+
+

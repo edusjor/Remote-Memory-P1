@@ -28,20 +28,17 @@ public:
     Calculadora();
 
 private:
-    int suma();
-    int resta();
-    int multiplicacion();
-    int division();
+    void interfaz();                            //la "interfaz" que se muestra al usuario
 
-    void mostrarPrevSumas();
-    string getValores(string keysDeOperacion);
-    void MemoryUsage();
-    void getAllMemoryValue();
+    void suma();
+    void resta();
+    void multiplicacion();
+    void division();
 
-    int guiOperacion(string);
-
-    int interfaz();
-
+    void guiOperacion(string operacion);        //donde el usuario digita los numeros. Hace las operaciones y comunica con el server.
+    void mostrarPrevOperaciones(string);        //muestra las operaciones anteriores de acuerdo a la operacion 
+    string getValores(string );                 //recibe las llaves del servidor guardadas en local
+    void MemoryUsage();                         //pide la cantidad de bytes utilizado en memoria 
 
 };
 
