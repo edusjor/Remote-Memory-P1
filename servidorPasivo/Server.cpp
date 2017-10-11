@@ -22,7 +22,7 @@
 
 List<string> list_1; //lista global
 int usoDeMemoria=0;
-
+int flagpasivoactivo=false;
 Server::Server() {
 
     int yes = 1;
@@ -155,8 +155,9 @@ void* Server::playSocket(void* socket_desc){
         string operacion5="pruebaConexionDesdeActivo";
         string operacion6="sincActivoToPasivo";
         string operacion7="sincPasivoToActivo";
+        string operacion8="flagpasivoactivo";
 
-
+            
 
 
 
@@ -185,7 +186,7 @@ void* Server::playSocket(void* socket_desc){
 
             srand(time(NULL));
             int nummRandom=rand();                      //crea un numero random
-            string llave=to_string(nummRandom*235);         //llave aleatoria numerica creada en el server, se pasa a string
+            string llave=to_string(nummRandom);         //llave aleatoria numerica creada en el server, se pasa a string
             cout << "Llave creada: "<<llave<<endl;
             clientKeysControl+=(llave+separador);         //concatena a la variable de control de llaves de este usuario la nueva llave creada
 
@@ -195,6 +196,8 @@ void* Server::playSocket(void* socket_desc){
             write(sock , chrLlave , strlen(chrLlave));  //envia la llave creada al cliente
             usoDeMemoria+=(sizeof(valor));            //Le suma a una variable de control de memoria el tamano del valor guardado
 
+            if (flagpasivoactivo==false)
+                flagpasivoactivo=true;
         }
 
 
@@ -264,7 +267,17 @@ void* Server::playSocket(void* socket_desc){
             write(sock , chrResp , 1024);  //envia la respuesta 
         }
 
- 
+
+        ////////////////////////////////////////
+        //pruebaConexionDesdeActivo con la flag
+        //hace la prueba si el pasivo esta sincronizado
+        if(operacion==operacion8){
+            string flag=to_string(flagpasivoactivo);
+            string respuesta="flagpasivoactivo="+flag;
+            char *chrResp = &respuesta[0u];                //convierte la llave de string a char
+            write(sock , chrResp , 1024);  //envia la respuesta 
+        }
+        
 
 
         ////////////////////////////////////////
@@ -336,14 +349,14 @@ void* Server::playSocket(void* socket_desc){
 
             string formatDatos=datosTodos;
 
-            if (formatDatos=="");
-                formatDatos="NoDataFound";
-            
+           
+
             char* chrDato = &formatDatos[0u];
             cout<<"hi1"<<endl;
             write(sock , chrDato , strlen(chrDato));
             cout<<"hi2"<<endl;
-            
+            if (formatDatos!="")
+                cout<<"datos enviados al activo:\n"<<formatDatos<<endl;
         }
 
 
@@ -472,3 +485,15 @@ int Sincronizacion::socketClientSINC(int puertoPasSINC) {
     }
 
 }
+
+
+
+
+//cuando el pasivo guarde un dato entonces flagpasivoactivo =true
+
+//si flagpasivoactivo entonces no sincroniza todo, solo uno.
+//si flagpasivoactivo fals entonces sincroniza todo con el valor anterior
+
+//funcion en pasivo, si verificar sinc, retorna la flagpasivoactivo
+//recibe sincronizacion entonces flagpasivoactivo = true
+

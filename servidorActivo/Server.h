@@ -68,7 +68,10 @@ private:
     void enviarTodo();
     int socketClient(int);
 
+
+
     void pedirDatosdeSINC();
+    int verifServPasSincronizado();
     int puertoPasivo=8889;   //este es el puerto del serverSINC en pasivo
     int client_SINC;
     char buffer_SINC[1024];

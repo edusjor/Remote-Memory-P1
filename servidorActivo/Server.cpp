@@ -69,8 +69,9 @@ Client *c;
 void Server::aceptarEimprimir() {
 
     
-    Sincronizacion sinc1; 
-    sinc1.getPasivoSinc();
+    Sincronizacion sinc2;
+    sinc2.getPasivoSinc();
+
     while (1) {
         
         c = new Client(); //reserva un nuevo "espacio" para el siguiente cliente que se conecte
@@ -185,9 +186,10 @@ void* Server::playSocket(void* socket_desc){
             cout << "Llave creada: "<<llave<<endl;
             clientKeysControl+=(llave+separador);         //concatena a la variable de control de llaves de este usuario la nueva llave creada
 
-            Sincronizacion sinc2;
-            sinc2.getPasivoSinc();
+            Sincronizacion sinc1; 
+            sinc1.getPasivoSinc();
 
+            
             list_1.add_head(llave,valor,size);          //guarda en la lista la llave, el valor y tamano del dato
 
             char *chrLlave = &llave[0u];                //convierte la llave de string a char
@@ -333,6 +335,7 @@ void Sincronizacion::sincronizar(string dato){
 }
 
 
+
 int Sincronizacion::verifServPas(){
     send(client_SINC,"pruebaConexionDesdeActivo#null#null#null",1024,0);
     n=recv(client_SINC, buffer_SINC, bufsize, 0);
@@ -428,10 +431,10 @@ cout<<"hola2"<<endl;
 
     char client_message[1024];
     recv(client_SINC , client_message , 1024 , 0);
-cout<<"hola3"<<endl;
 
     string strclient_message = string(client_message); //convierte el mensaje del cliente a string
         
+cout<<"datos recibidos: \n"<<strclient_message<<endl;
 
     string separador1="&";
     string separador2="@";

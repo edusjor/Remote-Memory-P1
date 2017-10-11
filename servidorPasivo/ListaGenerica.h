@@ -500,6 +500,9 @@ string List<T>::iterarTodo()
 }
 
 
+
+
+
 //Busca y retorna todos los datos con sus llaves en string acomodado
 //string     llave: valor
 //           llave2: valor2
@@ -525,6 +528,20 @@ string List<T>::retornarTodo()
     }
     return formato+datos; //retorna todos los datos en un string
 }
+
+
+//cuando el pasivo guarde un dato entonces flagpasivoactivo =true
+
+//si flagpasivoactivo entonces no sincroniza todo, solo uno.
+//si flagpasivoactivo fals entonces sincroniza todo con el valor anterior
+
+//funcion en pasivo, si verificar sinc, retorna la flagpasivoactivo
+//recibe sincronizacion entonces flagpasivoactivo = true
+
+
+
+
+
 
 // Ordenar de manera ascendente
 template<typename T>
