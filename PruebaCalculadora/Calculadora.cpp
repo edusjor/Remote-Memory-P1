@@ -170,6 +170,11 @@ void Calculadora::mostrarPrevOperaciones(string localKey){
     
     cout<<"--------------------------------------------------------------------------- "<<endl<<endl;
 
+
+    cout<<endl<<"Todas las llaves en "<<localKey<<" guardadas en local:"<<endl;
+    cout<<rmlib1->getAllLlavesDelServerEnLocal(localKey)<<endl;
+
+    cout<<"\n \n \n"<<endl;
     interfaz();
 }
 

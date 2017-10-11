@@ -65,10 +65,12 @@ Server::Server() {
 
 
 Client *c;
+
 void Server::aceptarEimprimir() {
 
-    Sincronizacion sinc;
-    sinc.getPasivoSinc();
+    
+    Sincronizacion sinc1; 
+    sinc1.getPasivoSinc();
     while (1) {
         
         c = new Client(); //reserva un nuevo "espacio" para el siguiente cliente que se conecte
@@ -176,10 +178,15 @@ void* Server::playSocket(void* socket_desc){
         //Guarda en la lista una la aleatoria, el valor y el tamano proveidas en el buffer
         if(operacion==operacion1){ 
 
+//    srand(time(0));
+            srand(time(NULL));
             int nummRandom=rand();                      //crea un numero random
             string llave=to_string(nummRandom);         //llave aleatoria numerica creada en el server, se pasa a string
             cout << "Llave creada: "<<llave<<endl;
             clientKeysControl+=(llave+separador);         //concatena a la variable de control de llaves de este usuario la nueva llave creada
+
+            Sincronizacion sinc2;
+            sinc2.getPasivoSinc();
 
             list_1.add_head(llave,valor,size);          //guarda en la lista la llave, el valor y tamano del dato
 
