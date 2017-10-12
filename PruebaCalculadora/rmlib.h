@@ -173,7 +173,7 @@ int rmlib::socketClient(int puerto,string ip) {
         cout << "\nError establishing socket..." << endl;
         exit(1);
     }
-    cout << "\n=> Socket client has been created..." << endl;
+    cout << "\n=> Socket..." << endl;
 
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(puerto);

@@ -112,30 +112,30 @@ void Calculadora::guiOperacion(string operacion){ // muestra los cin para la ent
     
     string oper="guardarValor";        
     string llave= "null";
-    string valor="";
+    int valor;
 
     if (operacion == "sumas"){ 
-        valor=to_string(num1+num2);
+        valor=(num1+num2);
         cout <<"La suma es: "<< valor <<endl<<endl;
     }
     if (operacion == "restas"){ 
-        valor=to_string(num1-num2);
+        valor=(num1-num2);
         cout <<"La resta es: "<< valor <<endl<<endl;
     }
     if (operacion == "multiplicaciones"){ 
-        valor=to_string(num1*num2);
+        valor=(num1*num2);
         cout <<"La multiplicacion es: "<< valor <<endl<<endl;
     }
     if (operacion == "divisiones"){ 
-        valor=to_string(num1/num2);
+        valor=(num1/num2);
         cout <<"La division es: "<< valor <<endl<<endl;
     }
-
+    string valorEncriptado=to_string(valor*362); //encripta el numero multiplicandolo por 362
     
     string size=to_string(sizeof(valor)); //manda el tamano en bits
 
 
-    string parametros = oper+"#"+llave+"#"+valor+"#"+size;
+    string parametros = oper+"#"+llave+"#"+valorEncriptado+"#"+size;
     char *chrParametros = &parametros[0u]; //convierte string a char
 
     string llaveDelServer=rmlib1->enviarDato(chrParametros); //envia el dato en formato "operacion#null#valor#tamano" y resive un string con la llave que crea el server
@@ -197,7 +197,20 @@ string Calculadora::getValores(string keysDeOperacion){
             string dataGot =rmlib1->rm_get(chrKey);
             if (dataGot=="noServerFound")
                 return "noServerFound";
-            datosDelServer+="=>"+dataGot+"\n";//envia la llave a la funcion en rmlib para que retorne el valor guardado en server
+
+            string datoEncriptado = dataGot;
+
+
+            int numero;
+            stringstream s(dataGot);
+            s >> numero;
+
+            string datoDesencriptado = to_string(numero/362);
+
+            cout<<"Dato recibido encriptado: "<<datoEncriptado<<endl<<endl;
+            
+            //string datoDesencriptado = (atoi(datoEncriptado));
+            datosDelServer+="=>"+datoDesencriptado+"\n";//envia la llave a la funcion en rmlib para que retorne el valor guardado en server
             key="";
         }
         else{
