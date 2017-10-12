@@ -22,7 +22,7 @@
 
 List<string> list_1; //lista global
 int usoDeMemoria=0;
-int flagpasivoactivo=false;
+int flagpasivosinc=false;
 Server::Server() {
 
     int yes = 1;
@@ -155,7 +155,7 @@ void* Server::playSocket(void* socket_desc){
         string operacion5="pruebaConexionDesdeActivo";
         string operacion6="sincActivoToPasivo";
         string operacion7="sincPasivoToActivo";
-        string operacion8="flagpasivoactivo";
+        string operacion8="flagpasivosinc";
 
             
 
@@ -165,10 +165,11 @@ void* Server::playSocket(void* socket_desc){
         ////////////////////////////////////////
         //pruebaConexion desde libreria
         //hace la prueba de conexion
-        if(operacion==operacion0){ 
-
-            string respuesta="pruebaConexionSuccess";
-           
+        if(operacion==operacion0){
+            string respuesta="nosincronizado";
+            if (flagpasivosinc == true) 
+                respuesta="sincronizado";
+            
             char *chrResp = &respuesta[0u];                //convierte la llave de string a char
             write(sock , chrResp , 1024);  //envia la llave creada al cliente
         }
@@ -196,8 +197,8 @@ void* Server::playSocket(void* socket_desc){
             write(sock , chrLlave , strlen(chrLlave));  //envia la llave creada al cliente
             usoDeMemoria+=(sizeof(valor));            //Le suma a una variable de control de memoria el tamano del valor guardado
 
-            if (flagpasivoactivo==false)
-                flagpasivoactivo=true;
+            if (flagpasivosinc==false)
+                flagpasivosinc=true;
         }
 
 
@@ -257,23 +258,28 @@ void* Server::playSocket(void* socket_desc){
 
 
 
+
         ////////////////////////////////////////
         //pruebaConexionDesdeActivo
         //hace la prueba de conexion
         if(operacion==operacion5){
 
-            string respuesta="pruebaConexionDesdeActivoSuccess";
+            //string respuesta="pruebaConexionDesdeActivoSuccess";
+            
+            string flag=to_string(flagpasivosinc);
+            flagpasivosinc=1;
+            string respuesta="flagpasivosinc="+flag;
             char *chrResp = &respuesta[0u];                //convierte la llave de string a char
             write(sock , chrResp , 1024);  //envia la respuesta 
         }
 
 
         ////////////////////////////////////////
-        //pruebaConexionDesdeActivo con la flag
+        //flagpasivosinc con la flag
         //hace la prueba si el pasivo esta sincronizado
         if(operacion==operacion8){
-            string flag=to_string(flagpasivoactivo);
-            string respuesta="flagpasivoactivo="+flag;
+            string flag=to_string(flagpasivosinc);
+            string respuesta="flagpasivosinc="+flag;
             char *chrResp = &respuesta[0u];                //convierte la llave de string a char
             write(sock , chrResp , 1024);  //envia la respuesta 
         }
@@ -285,6 +291,9 @@ void* Server::playSocket(void* socket_desc){
         //sincroniza los datos recibidos del activo al pasivo
         if(operacion==operacion6){
 
+            if (flagpasivosinc==false)
+                flagpasivosinc=true;
+            
             string separador1="&";
             string separador2="@";
 

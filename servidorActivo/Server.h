@@ -59,9 +59,10 @@ public:
 
 class Sincronizacion{
 public:
-    //Sincronizacion();
-    void sincronizar(string);
-    void getPasivoSinc();     //pide los datos de sincronizacion al pasivo si no esta sincronizado
+  
+    void whenllegaDatoAactivo(string dato);
+
+    void whenActivoInicia();
 private:
     int verifServPas();
     void enviarDato(string dato);

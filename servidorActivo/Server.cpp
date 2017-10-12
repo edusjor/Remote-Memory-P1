@@ -70,7 +70,7 @@ void Server::aceptarEimprimir() {
 
     
     Sincronizacion sinc2;
-    sinc2.getPasivoSinc();
+    sinc2.whenActivoInicia();
 
     while (1) {
         
@@ -186,9 +186,6 @@ void* Server::playSocket(void* socket_desc){
             cout << "Llave creada: "<<llave<<endl;
             clientKeysControl+=(llave+separador);         //concatena a la variable de control de llaves de este usuario la nueva llave creada
 
-            Sincronizacion sinc1; 
-            sinc1.getPasivoSinc();
-
             
             list_1.add_head(llave,valor,size);          //guarda en la lista la llave, el valor y tamano del dato
 
@@ -200,7 +197,7 @@ void* Server::playSocket(void* socket_desc){
 
             Sincronizacion sinc;
             
-            sinc.sincronizar(dato);
+            sinc.whenllegaDatoAactivo(dato);
         }
 
 
@@ -297,57 +294,90 @@ void* Server::playSocket(void* socket_desc){
 
 
 
-int flagPasivoisON=false;    //flag para controlar si el pasivo esta activo y asi sincronizarlo activoToPasivo
-int sincPasivoToActivo = false; //flag para controlar si el pasivo esta activo y asi sincronizarlo pasivoToActivo
 
 //sincronizar a pasivo
-void Sincronizacion::sincronizar(string dato){
-    int i=1;
-    if(socketClient(puertoPasivo)==i){//crea la conexion
-        cout<<"pasivo conectado 1"<<endl;
-        if (verifServPas() ==1){//verifica la conexion, si pasivo esta activo
-            cout<<"pasivo conectado 2 "<<endl;
 
-            if (flagPasivoisON==true){
-                cout<<"por enviar ultimo dato"<<endl;
-                enviarDato(dato);//enviar dato solamente
 
-                cout<<"enviado ultimo dato"<<endl;
-            }
 
-            if (flagPasivoisON==false){
-                flagPasivoisON=true;
-                cout<<"por enviar todo"<<endl;
-                enviarTodo(); //enviar todo
-                cout<<"enviado todo "<<endl;
-            }
-                
-
-            
-        }else{
-            flagPasivoisON=false;
-            cout<<"pasivo NO conectado"<<endl;
-        }
-    }else{
-        cout<<"pasivo NO conectado 2"<<endl;
-            flagPasivoisON=false;
-        }//si no el servidor pasivo esta desconectado
-}
-
+int pasivoConectado=false;
 
 
 int Sincronizacion::verifServPas(){
     send(client_SINC,"pruebaConexionDesdeActivo#null#null#null",1024,0);
     n=recv(client_SINC, buffer_SINC, bufsize, 0);
-    memset(buffer_SINC, 0, 1024);
+    //memset(buffer_SINC, 0, 1024);
+    string mensaje = string(buffer_SINC);
+
     if (n<=0){
-        cout << "servidor pasivo NO conectado"<<endl<<endl<<endl<<endl<<endl;
-        return 0;
+        return 2;
     }
-    cout << "servidor pasivo SI conectado"<<endl<<endl<<endl<<endl<<endl;
-    return 1;
+   
+    cout <<"mensaje: "<<mensaje<<endl;
+    if(mensaje=="flagpasivosinc=1")
+        return 1;
+    if (mensaje == "flagpasivosinc=0")
+        return 0;
 }
 
+void Sincronizacion::whenActivoInicia(){
+    int i = 1;
+    if(socketClient(puertoPasivo)==i){//crea la conexion
+        cout<<"crea socket"<<endl;
+
+        int verifPasivo= verifServPas();
+        if (verifPasivo==1){
+            //pedir todos datos
+            pedirDatosdeSINC();
+            pasivoConectado=true;
+        }
+        if (verifPasivo==0){ 
+            //no pedir nada
+            pasivoConectado=true;
+        }
+    }else{ 
+       //cout<<"NO crea socket"<<endl;
+    }
+}
+
+
+
+
+
+
+
+void Sincronizacion::whenllegaDatoAactivo(string dato){
+
+    //send(client_SINC,"flagpasivosinc#null#null#null",1024,0);
+    //n=recv(client_SINC, buffer_SINC, bufsize, 0);
+    
+    int i = 1;
+    if(socketClient(puertoPasivo)==i){//crea la conexion
+        cout<<"crea socket"<<endl;
+        int verifPasivo= verifServPas();
+
+        if (pasivoConectado==true){
+            if (verifPasivo == 1){
+                enviarDato(dato);
+            }
+            if (verifPasivo==0){
+                enviarTodo();
+            }
+            if (verifPasivo==2){
+                pasivoConectado=false;
+            }
+        }
+
+        if (pasivoConectado==false){
+            if (verifPasivo!=2){
+                enviarTodo();
+                pasivoConectado=true;
+            }
+        }
+    }
+    else{ 
+        cout<<"NO crea socket"<<endl;
+    }
+}
 void Sincronizacion::enviarDato(string dato){
     string formatDatos="sincActivoToPasivo#"+dato+"#null#null";
     char* chrDato = &formatDatos[0u];
@@ -388,43 +418,16 @@ int Sincronizacion::socketClient(int puertoPasivo) {
     else{
         return 1;
     }
-
 }
 
 
-
-
-//Pide los datos de sincronizacion al pasivo
-void Sincronizacion::getPasivoSinc(){
-
-    int i=1;
-    if(socketClient(puertoPasivo)==i){//crea la conexion
-        cout<<"pasivo conectado 1"<<endl;
-        if (verifServPas() ==1){//verifica la conexion, si pasivo esta activo
-            cout<<"pasivo conectado 2 "<<endl;
-
-            if (sincPasivoToActivo==true){
-                //no hacer nada. Activo si esta sincronizados con pasivo
-            }
-
-            if (sincPasivoToActivo==false){
-                sincPasivoToActivo=true;
-                
-                //pedir datos
-                pedirDatosdeSINC();
-            }              
-        }
-    }
-}
 
 //pide los datos de sincronizacion al pasivo. Si no esta sincronizados
 void Sincronizacion::pedirDatosdeSINC(){
     string formatDatos="sincPasivoToActivo#null#null#null";
     char* chrDato = &formatDatos[0u];
 
-    cout<<"hola1"<<endl;
     write(client_SINC , chrDato , strlen(chrDato));
-cout<<"hola2"<<endl;
     string size="";
     //int read_size;
     //client_message[read_size] = '\0';
@@ -444,7 +447,7 @@ cout<<"datos recibidos: \n"<<strclient_message<<endl;
     string valor=strclient_message;
 
 
-    string llav="";
+            string llav="";
             string val="";
             string siz=""; //esta var la hace con sizeof en local
 
