@@ -530,13 +530,6 @@ string List<T>::retornarTodo()
 }
 
 
-//cuando el pasivo guarde un dato entonces flagpasivoactivo =true
-
-//si flagpasivoactivo entonces no sincroniza todo, solo uno.
-//si flagpasivoactivo fals entonces sincroniza todo con el valor anterior
-
-//funcion en pasivo, si verificar sinc, retorna la flagpasivoactivo
-//recibe sincronizacion entonces flagpasivoactivo = true
 
 
 

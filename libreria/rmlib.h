@@ -219,13 +219,17 @@ string rmlib::enviarDato(char* dato){
 //prueba la conexion al sever, envia los datos y recibe la llave creada por el server para esos datos y la retorna
 string rmlib::rm_new(char* dato){
       
+        
+
+
         send(client,"pruebaConexion#null#null#null",1024,0); //envia datos para hacer prueba de conexion en formato:   "operacion a realizar#null#null#null"
 
         n = recv(client, buffer, bufsize, 0); //respuesta de la prueba 
         if (n<=0){   
             cout << "servidor no conectado"<<endl<<endl<<endl<<endl<<endl;
             return "0";
-        }        
+        }
+              
 
         memset(buffer, 0, 1024);
 
@@ -243,6 +247,17 @@ string rmlib::rm_new(char* dato){
 //para hacer peticion al server se manda: operacion a realizar, llave, valor, tamano.
 //retorna el valor en el server asociado a la llave
 string rmlib::rm_get(string llave){
+
+    if (socketClient(portActivo,ipActivo)==0 ){ 
+            if (socketClient(portPasivo,ipPasivo)==0){
+            cout<<"Ningun servidor esta disponible"<<endl;
+            return "NoServerFound";
+            }   
+            else
+                cout<<"Activo no disponible, conectado al servidor Pasivo"<<endl;
+        }//else
+        //cout<<"Conectado al servidor Activo"<<endl;
+
 
     string operacion="getValor#";
     string datosize= "#null#null";

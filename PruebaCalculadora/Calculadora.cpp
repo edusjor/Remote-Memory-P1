@@ -31,6 +31,7 @@ Calculadora::Calculadora()  {
 
 
 void Calculadora::interfaz(){
+    cout<<"-----------------------------------------------------"<<endl;
     cout <<endl<<endl<< "1-Suma"<<endl;
     cout << "2-Restar"<<endl;
     cout << "3-Multiplicar"<<endl;
