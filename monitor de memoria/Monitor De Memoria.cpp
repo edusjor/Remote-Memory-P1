@@ -25,6 +25,7 @@ Monitor_De_Memoria::Monitor_De_Memoria(){
 }
 
 int Monitor_De_Memoria::interfaz(){
+    cout<<"\n----------------------------------------"<<endl;
     cout << "1-Memory Usage"<<endl;
     cout << "2-Memory Values"<<endl;
     cout << "3-Salir"<<endl;

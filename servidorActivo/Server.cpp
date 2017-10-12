@@ -182,7 +182,9 @@ void* Server::playSocket(void* socket_desc){
             srand(time(NULL));
             int nummRandom=rand();                      //crea un numero random
             string llave=to_string(nummRandom);         //llave aleatoria numerica creada en el server, se pasa a string
+            cout<<"Dato recibido: "<<valor<<endl;
             cout << "Llave creada: "<<llave<<endl;
+
             clientKeysControl+=(llave+separador);         //concatena a la variable de control de llaves de este usuario la nueva llave creada
 
             
@@ -192,8 +194,10 @@ void* Server::playSocket(void* socket_desc){
             write(sock , chrLlave , strlen(chrLlave));  //envia la llave creada al cliente
             usoDeMemoria+=(sizeof(valor));            //Le suma a una variable de control de memoria el tamano del valor guardado
         
-            string dato = llave+"&"+valor+"@";
+            
 
+            string dato = llave+"&"+valor+"@";
+            
             Sincronizacion sinc;
             
             sinc.whenllegaDatoAactivo(dato);
@@ -351,7 +355,7 @@ void Sincronizacion::whenllegaDatoAactivo(string dato){
 
     //send(client_SINC,"flagpasivosinc#null#null#null",1024,0);
     //n=recv(client_SINC, buffer_SINC, bufsize, 0);
-    
+ 
     int i = 1;
     if(socketClient(puertoPasivo)==i){//crea la conexion
         cout<<"crea socket"<<endl;

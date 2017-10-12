@@ -181,6 +181,7 @@ void* Server::playSocket(void* socket_desc){
             srand(time(NULL));
             int nummRandom=rand();                      //crea un numero random
             string llave=to_string(nummRandom);         //llave aleatoria numerica creada en el server, se pasa a string
+            cout<<"Dato recibido: "<<valor<<endl;
             cout << "Llave creada: "<<llave<<endl;
             clientKeysControl+=(llave+separador);         //concatena a la variable de control de llaves de este usuario la nueva llave creada
 
