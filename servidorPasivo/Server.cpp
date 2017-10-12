@@ -234,7 +234,7 @@ void* Server::playSocket(void* socket_desc){
         //envia al cliente el uso de memoria actual, en bytes
         if (operacion==operacion3){ 
 
-                string str_UsoDeMemoria=to_string(usoDeMemoria/4)+" bytes";       //convierte a string la var de control de memoria
+                string str_UsoDeMemoria=to_string(usoDeMemoria)+" bits";       //convierte a string la var de control de memoria
                 char *chrDato = &str_UsoDeMemoria[0u];                          //convierte de string a char
                 write(sock , chrDato , strlen(chrDato));                        //envia el dato de control de memoria al cliente
             }
@@ -293,7 +293,7 @@ void* Server::playSocket(void* socket_desc){
 
             if (flagpasivosinc==false)
                 flagpasivosinc=true;
-            
+
             string separador1="&";
             string separador2="@";
 
@@ -332,10 +332,10 @@ void* Server::playSocket(void* socket_desc){
                     size=to_string(sizeof(val));
                     list_1.add_head(llav,val,siz);
 
-                    usoDeMemoria+=sizeof(val);
+                    usoDeMemoria+=(sizeof(val));
 
                     flag = 0;
-                    cout <<"val: "<<val<<endl;
+                    cout <<"Dato recibido del activo: "<<val<<endl;
                     llav="";
                     val="";
                     size="";
@@ -354,16 +354,12 @@ void* Server::playSocket(void* socket_desc){
 
             string datosTodos = "";
             datosTodos = list_1.iterarTodo();//trae todos los datos de la lista   
-            cout<<"Todos los datos: "<<datosTodos<<endl;
+            cout<<"Todos los datos enviados al activo: "<<datosTodos<<endl;
 
             string formatDatos=datosTodos;
 
-           
-
             char* chrDato = &formatDatos[0u];
-            cout<<"hi1"<<endl;
             write(sock , chrDato , strlen(chrDato));
-            cout<<"hi2"<<endl;
             if (formatDatos!="")
                 cout<<"datos enviados al activo:\n"<<formatDatos<<endl;
         }

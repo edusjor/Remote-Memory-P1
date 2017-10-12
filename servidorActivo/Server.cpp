@@ -22,7 +22,6 @@
 
 List<string> list_1; //lista global
 int usoDeMemoria=0;
-int estadoPasivo=true;
 
 Server::Server() {
     
@@ -179,7 +178,7 @@ void* Server::playSocket(void* socket_desc){
         //Guarda en la lista una la aleatoria, el valor y el tamano proveidas en el buffer
         if(operacion==operacion1){ 
 
-//    srand(time(0));
+
             srand(time(NULL));
             int nummRandom=rand();                      //crea un numero random
             string llave=to_string(nummRandom);         //llave aleatoria numerica creada en el server, se pasa a string
@@ -191,7 +190,7 @@ void* Server::playSocket(void* socket_desc){
 
             char *chrLlave = &llave[0u];                //convierte la llave de string a char
             write(sock , chrLlave , strlen(chrLlave));  //envia la llave creada al cliente
-            usoDeMemoria+=(sizeof(valor))/4;            //Le suma a una variable de control de memoria el tamano del valor guardado
+            usoDeMemoria+=(sizeof(valor));            //Le suma a una variable de control de memoria el tamano del valor guardado
         
             string dato = llave+"&"+valor+"@";
 
@@ -236,7 +235,7 @@ void* Server::playSocket(void* socket_desc){
         //envia al cliente el uso de memoria actual, en bytes
         if (operacion==operacion3){ 
 
-                string str_UsoDeMemoria=to_string(usoDeMemoria)+" bytes";       //convierte a string la var de control de memoria
+                string str_UsoDeMemoria=to_string(usoDeMemoria)+" bits";       //convierte a string la var de control de memoria
                 char *chrDato = &str_UsoDeMemoria[0u];                          //convierte de string a char
                 write(sock , chrDato , strlen(chrDato));                        //envia el dato de control de memoria al cliente
         }
@@ -312,13 +311,16 @@ int Sincronizacion::verifServPas(){
         return 2;
     }
    
-    cout <<"mensaje: "<<mensaje<<endl;
+    cout <<"mensaje de verificacion: "<<mensaje<<endl;
     if(mensaje=="flagpasivosinc=1")
         return 1;
     if (mensaje == "flagpasivosinc=0")
         return 0;
 }
 
+//cuando el ativo inicia se llama esta funcion
+//que verifica si el pasivo esta activo, si lo esta
+//le pide los datos que tenga guardados; si tiene alguno
 void Sincronizacion::whenActivoInicia(){
     int i = 1;
     if(socketClient(puertoPasivo)==i){//crea la conexion
@@ -386,7 +388,7 @@ void Sincronizacion::enviarDato(string dato){
 
 void Sincronizacion::enviarTodo(){
     string datosTodos = list_1.iterarTodo();//trae todos los datos de la lista   
-    cout<<"datos todos: "<<datosTodos<<endl;
+    cout<<"Todos los datos enviados al pasivo: "<<datosTodos<<endl;
     enviarDato(datosTodos);
 }
 
@@ -437,7 +439,7 @@ void Sincronizacion::pedirDatosdeSINC(){
 
     string strclient_message = string(client_message); //convierte el mensaje del cliente a string
         
-cout<<"datos recibidos: \n"<<strclient_message<<endl;
+cout<<"\nDatos recibidos: \n"<<strclient_message<<endl;
 
     string separador1="&";
     string separador2="@";
@@ -481,7 +483,7 @@ cout<<"datos recibidos: \n"<<strclient_message<<endl;
                     usoDeMemoria+=sizeof(val);
 
                     flag = 0;
-                    cout <<"val: "<<val<<endl;
+                    cout <<"Dato recibido del pasivo: "<<val<<endl;
                     llav="";
                     val="";
                     size="";
