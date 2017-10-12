@@ -148,7 +148,7 @@ void Calculadora::guiOperacion(string operacion){ // muestra los cin para la ent
         rmlib1->savellaveEnListaLocal(operacion,llaveDelServer); //guarda la llave del server con una llave local
     }
 
-    cout<<"\nllaves de operacion " <<operacion<<": "<<rmlib1->getAllLlavesDelServerEnLocal(operacion)<<endl<<endl;//trae todas las llaves guardadas en local del server.
+    //cout<<"\nllaves de operacion " <<operacion<<": "<<rmlib1->getAllLlavesDelServerEnLocal(operacion)<<endl<<endl;//trae todas las llaves guardadas en local del server.
     
     interfaz();
 
@@ -167,7 +167,7 @@ void Calculadora::mostrarPrevOperaciones(string localKey){
         cout<<"servidores no available"<<endl;
         interfaz();
     }    
-    cout<<"Todas los resultados de "<<localKey<<" anteriores: "<<resultados<<endl;
+    cout<<"Todos los resultados de "<<localKey<<" anteriores: "<<resultados<<endl;
     
     cout<<"--------------------------------------------------------------------------- "<<endl<<endl;
 

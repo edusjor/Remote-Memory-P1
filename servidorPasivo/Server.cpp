@@ -22,7 +22,8 @@
 
 List<string> list_1; //lista global
 int usoDeMemoria=0;
-int flagpasivosinc=false;
+int flagpasivosinc=false;  // si tiene almenos un dato guardado se convierte en true
+
 Server::Server() {
 
     int yes = 1;
@@ -96,7 +97,7 @@ void Server::aceptarEimprimir() {
 //Aqui se maneja todas las peticiones del cliente
 void* Server::playSocket(void* socket_desc){
     string clientKeysControl=""; //string que lleva el conteo de llaves creadas por este cliente.
-    string separador="#";
+    string separador="#";           //en el conteo de llaves separa cada una con este separador
 
     
     int sock = *(int*)socket_desc;
@@ -115,6 +116,7 @@ void* Server::playSocket(void* socket_desc){
 
         //itera el string del char recibido en el mensaje 
         //para separar la llave, el valor y el tamano
+        //despues de eso se hace su respectiva accion segun operacion
         string strclient_message = string(client_message); //convierte el mensaje del cliente a string
         
         int cont=0;
@@ -140,12 +142,6 @@ void* Server::playSocket(void* socket_desc){
 
         val=llave;
 
-
-
-
-
-
-
        
         string operacion0="pruebaConexion";
         string operacion1="guardarValor";
@@ -155,10 +151,6 @@ void* Server::playSocket(void* socket_desc){
         string operacion5="pruebaConexionDesdeActivo";
         string operacion6="sincActivoToPasivo";
         string operacion7="sincPasivoToActivo";
-        string operacion8="flagpasivosinc";
-
-            
-
 
 
         
@@ -172,6 +164,7 @@ void* Server::playSocket(void* socket_desc){
             
             char *chrResp = &respuesta[0u];                //convierte la llave de string a char
             write(sock , chrResp , 1024);  //envia la llave creada al cliente
+            cout<<"prueba de conexion"<<endl;
         }
 
 
@@ -245,7 +238,7 @@ void* Server::playSocket(void* socket_desc){
 
         ////////////////////////////////////////
         //getAllMemoryValues
-        //envia al cliente lo que hay en memoria actual
+        //envia al cliente todo lo que hay en memoria actual
         if (operacion==operacion4){ 
 
                 string str_Memory_values = list_1.retornarTodo();
@@ -268,27 +261,19 @@ void* Server::playSocket(void* socket_desc){
             
             string flag=to_string(flagpasivosinc);
             flagpasivosinc=1;
-            string respuesta="flagpasivosinc="+flag;
+            string respuesta="flagpasivosinc="+flag; //flag puede ser 0 o 1
             char *chrResp = &respuesta[0u];                //convierte la llave de string a char
             write(sock , chrResp , 1024);  //envia la respuesta 
+            cout<<"prueba de conexion"<<endl;
         }
 
 
-        ////////////////////////////////////////
-        //flagpasivosinc con la flag
-        //hace la prueba si el pasivo esta sincronizado
-        if(operacion==operacion8){
-            string flag=to_string(flagpasivosinc);
-            string respuesta="flagpasivosinc="+flag;
-            char *chrResp = &respuesta[0u];                //convierte la llave de string a char
-            write(sock , chrResp , 1024);  //envia la respuesta 
-        }
-        
 
 
         ////////////////////////////////////////
         //sincActivoToPasivo
         //sincroniza los datos recibidos del activo al pasivo
+        //recibe todo en formato llave&valor@llave1&valor@....
         if(operacion==operacion6){
 
             if (flagpasivosinc==false)
@@ -354,7 +339,6 @@ void* Server::playSocket(void* socket_desc){
 
             string datosTodos = "";
             datosTodos = list_1.iterarTodo();//trae todos los datos de la lista   
-            cout<<"Todos los datos enviados al activo: "<<datosTodos<<endl;
 
             string formatDatos=datosTodos;
 
@@ -387,118 +371,4 @@ void* Server::playSocket(void* socket_desc){
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//sincronizar a activo
-//arreglar  
-void Sincronizacion::sincronizar(){
-
-    if(socketClientSINC(puertoServAct)==1){//crea la conexion con activo
-
-        if (verifServAct() ==1){//verifica la conexion, si pasivo esta activo
-            cout<<"pasivo SI conectado "<<endl;
-            if (flagPasivoisON==false){
-                flagPasivoisON=true;
-                enviarTodo(); //enviar todo
-            }else{
-                //enviarDato(dato);//enviar dato solamente
-
-            }
-        }else{
-            flagPasivoisON=false;
-            cout<<"pasivo NO conectado 2"<<endl;
-        }
-    }else{
-            cout<<"pasivo NO conectado 1"<<endl;
-            flagPasivoisON=false;
-        }//si no el servidor pasivo esta desconectado
-}
-
-
-int Sincronizacion::verifServAct(){
-    send(client_SINC,"pruebaConexion",1024,0);
-    n=recv(client_SINC, buffer_SINC, bufsize, 0);
-    memset(buffer_SINC, 0, 1024);
-    if (n<=0){
-        //cout << "servidor pasivo no conectado"<<endl<<endl<<endl<<endl<<endl;
-        return 0;
-    }
-    return 1;
-}
-
-string Sincronizacion::enviarDato(string dato){
-    char* chrDato = &dato[0u];
-    write(client_SINC , chrDato , strlen(chrDato));
-}
-
-string Sincronizacion::enviarTodo(){
-    string datosTodos = list_1.iterarTodo();//trae todos los datos de la lista
-    enviarDato(datosTodos);
-}
-
-
-//Cliente socket del servidor
-int Sincronizacion::socketClientSINC(int puertoPasSINC) {
-
-    struct sockaddr_in server_addr;
-
-    client_SINC = socket(AF_INET, SOCK_STREAM, 0);
-
-    // ---------- ESTABLISHING SOCKET CONNECTION ----------//
-    // --------------- socket() function ------------------//
-
-    if (client_SINC < 0) {
-        cout << "\nError establishing socket..." << endl;
-        exit(1);
-    }
-    cout << "\n=> Socket client has been created..." << endl;
-
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(puertoPasSINC);
-
-
-
-    if (connect(client_SINC, (struct sockaddr *) &server_addr, sizeof(server_addr))<0){ //si no se conecta
-        return 0;
-    }
-    else{
-        return 1;
-    }
-
-}
-
-
-
-
-//cuando el pasivo guarde un dato entonces flagpasivoactivo =true
-
-//si flagpasivoactivo entonces no sincroniza todo, solo uno.
-//si flagpasivoactivo fals entonces sincroniza todo con el valor anterior
-
-//funcion en pasivo, si verificar sinc, retorna la flagpasivoactivo
-//recibe sincronizacion entonces flagpasivoactivo = true
 

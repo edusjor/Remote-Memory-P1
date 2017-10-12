@@ -25,29 +25,24 @@ using namespace std;
 class Server {
 private:
     static vector<Client> clients;
+    static void* playSocket(void* var); //Aqui se maneja todas las peticiones del cliente
+
+    char buffer[1024];
+    
+    struct sockaddr_in server_addr;
+    
+    socklen_t size;
 
     int client, servere;
     int portNum = 8889;
-    bool isExit = false;
     int bufsize = 1024;
-    char buffer[1024];
+    
 
-    struct sockaddr_in server_addr;
-    socklen_t size;
-
-    char buff[1024];
-
-    static void* playSocket(void* var);
-
-    static void* iniciarSincro(void*);
-
-    int socketClient(int puerto);
-
-
+    
 
 public:
-    Server();
-    void aceptarEimprimir();
+    Server(); //inicia el socket
+    void aceptarEimprimir(); //escucha los clientes y crea el thread
 
     
 
@@ -63,7 +58,7 @@ public:
 
 
 
-
+/*
 
 class Sincronizacion{
 public:
@@ -104,7 +99,7 @@ private:
     
     
     
-};
+};*/
 
 
 
